@@ -27,6 +27,10 @@ class pbs(scheduler):
      self.type = scheduler_type
 
   def create_header(self,headerType,test):
+    if(headerType == "build"):
+      file_out = test.fb
+    else:
+      file_out = test.ft
     if(test.dryrun):
       print("#!/bin/sh -l\n")
       if(headerType == "build"):
@@ -57,6 +61,10 @@ class slurm(scheduler):
      self.type = scheduler_type
 
   def create_header(self,headerType,test):
+    if(headerType == "build"):
+      file_out = test.fb
+    else:
+      file_out = test.ft
     if(test.dryrun):
       print("#!/bin/sh -l")
       print("#SBATCH --account={}".format(test.account))
@@ -187,9 +195,10 @@ class ESMFTest:
        if(self.dryrun):
          print("would have executed {}".format(cmdstring))
          print("would have cd'd to {}".format(subdir))
+         os.system("mkdir {}".format(subdir))
        else:
          status= subprocess.check_output(cmdstring,shell=True).strip().decode('utf-8')
-         os.chdir(subdir)
+       os.chdir(subdir)
        self.runcmd("rm -rf obj mod lib examples test *.o *.e *bat.o* *bat.e*")
        self.runcmd("git checkout {}".format(self.branch))
        self.runcmd("git pull origin {}".format(self.branch))
@@ -202,15 +211,16 @@ class ESMFTest:
             mpidict = self.machine_list[comp]['versions'][ver]['mpi']
             mpitypes= mpidict.keys()
             print(self.machine_list[comp]['versions'][ver])
-            for key in mpitypes:
-              subdir="{}_{}_{}_{}".format(comp,ver,key,build_type)
-              self.updateRepo(subdir)
-              self.b_filename = 'build-{}_{}_{}_{}.bat'.format(comp,ver,key,build_type)
-              self.t_filename = 'test-{}_{}_{}_{}.bat'.format(comp,ver,key,build_type)
-#             fb = open(filename, "w")
-#             ft = open(t_filename, "w")
-              self.scheduler.create_header("build",self)
-              self.scheduler.create_header("test",self)
+            for branch in self.machine_list['branch']:
+              for key in mpitypes:
+                subdir="{}_{}_{}_{}".format(comp,ver,key,build_type)
+                self.updateRepo(subdir)
+                self.b_filename = 'build-{}_{}_{}_{}.bat'.format(comp,ver,key,build_type)
+                self.t_filename = 'test-{}_{}_{}_{}.bat'.format(comp,ver,key,build_type)
+                self.fb = open(self.b_filename, "w")
+                self.ft = open(self.t_filename, "w")
+                self.scheduler.create_header("build",self)
+                self.scheduler.create_header("test",self)
 #              if("unloadmodule" in machine_list[comp]):
 #                fb.write("\nmodule unload {}\n".format(machine_list[comp]['unloadmodule']))
 #                ft.write("\nmodule unload {}\n".format(machine_list[comp]['unloadmodule']))
@@ -232,6 +242,7 @@ class ESMFTest:
 #                    fb.write("{}\n".format(machine_list[comp]['versions'][ver]['extra_commands'][cmd]))
 #                    ft.write("{}\n".format(machine_list[comp]['versions'][ver]['extra_commands'][cmd]))
 
+        os.chdir("..")
     
 if __name__ == "__main__":
   parser = argparse.ArgumentParser(description='ESMF nightly build/test system')
