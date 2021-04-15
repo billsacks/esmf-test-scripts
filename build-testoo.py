@@ -28,6 +28,7 @@ class NoScheduler(scheduler):
     self.type = scheduler_type
 
   def submit(self,test,subdir,mpiver,branch):
+    print("HEY, in submit")
     os.system("chmod +x {}".format(test.b_filename))
     jobnum = 12345
     os.system("./{} {}".format(test.b_filename,jobnum))
@@ -50,7 +51,7 @@ class NoScheduler(scheduler):
       else:
         file_out = test.ft
         jobid = 12346
-      file_out.write("#!/bin/bash -l\n")
+      file_out.write("#!{} -l\n".format(test.bash))
       file_out.write("export JOBID={}\n".format(jobid))
 
 class pbs(scheduler):
@@ -162,6 +163,10 @@ class ESMFTest:
         self.https = True
       else: 
         self.https = False
+      if("bash" in self.machine_list):
+        self.bash = self.machine_list['bash']
+      else: 
+        self.bash = "/bin/bash"
       if("account" in self.machine_list):
         self.account = self.machine_list['account']
       else: 
@@ -252,7 +257,7 @@ class ESMFTest:
       else:
         pythonscript = open("runpython.sh", "w")
         file_out = pythonscript
-        file_out.write("#!/bin/bash -l\n")
+        file_out.write("#!{} -l\n".format(self.bash))
         file_out.write("cd {}\n".format(os.getcwd()))
         file_out.write("export ESMFMKFILE=`find $PWD/DEFAULTINSTALLDIR -iname esmf.mk`\n\n")
         file_out.write("cd {}/src/addon/ESMPy".format(os.getcwd()))
@@ -359,19 +364,19 @@ class ESMFTest:
 
   def createGetResScripts(self,monitor_cmd_build,monitor_cmd_test):
     # write these out no matter what, so we can run them manually, if necessary
+    print("HEY!! in create get res")
     get_res_file = open("getres-build.sh", "w")
-    get_res_file.write("#!{} -l\n".format(bash))
+    get_res_file.write("#!{} -l\n".format(self.bash))
     get_res_file.write("{} >& /dev/null &\n".format(monitor_cmd_build))
     get_res_file.close() 
     os.system("chmod +x getres-build.sh")      
 
     get_res_file = open("getres-test.sh", "w")
-    get_res_file.write("#!{} -l\n".format(bash))
+    get_res_file.write("#!{} -l\n".format(self.bash))
     get_res_file.write("{} >& /dev/null &\n".format(monitor_cmd_test))
     get_res_file.close()
     os.system("chmod +x getres-test.sh")      
 
-    self.scheduler.submit(self,subdir,self.mpiver,branch)
   def createJobCards(self):
       for build_type in self.build_types:
         for comp in self.machine_list['compiler']:
@@ -400,7 +405,9 @@ class ESMFTest:
                 self.fb = open(self.b_filename, "w")
                 self.ft = open(self.t_filename, "w")
                 self.scheduler.create_headers(self)
+                print("creating scripts")
                 self.createScripts(build_type,comp,ver,mpidict,mpitypes,key,branch)
+                self.scheduler.submit(self,subdir,self.mpiver,branch)
 
         os.chdir("..")
     
