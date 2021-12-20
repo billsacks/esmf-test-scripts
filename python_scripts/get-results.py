@@ -33,6 +33,25 @@ def checkqueue(jobid,scheduler):
       return True
     return False
 
+def sanitize_test_results(values):
+    results = []
+    for value in values:
+        f_value = value.lower().strip()
+        print("f_value: ", f_value)
+        if f_value == "-1":
+            results.append("\tQUEUED")
+            continue
+        if f_value == "fail":
+            results.append("\tFAIL")
+            continue
+        try:
+            int(f_value)
+        except ValueError:
+            # Don't raise an exception but warn in the log
+            print(f"WARNING: Unknown value type {value}")
+        results.append(value)
+    return results
+
 def copy_artifacts(build_dir,artifacts_root,machine_name,mpiversion,oe_filelist,jobid,scheduler,branch):
 
   build_basename = os.path.basename(build_dir)
@@ -123,12 +142,14 @@ def copy_artifacts(build_dir,artifacts_root,machine_name,mpiversion,oe_filelist,
   summary_file.write('Build for = {}, mpi version {} on {}\n'.format(build_basename,mpiversion,machine_name))
   summary_file.write('Build time = {}\n'.format(build_time))
   summary_file.write('git hash = {}\n\n'.format(build_hash))
-  unit_results = re.sub(' FAIL','\tFAIL',unit_results)
-  system_results = re.sub(' FAIL',' \tFAIL',system_results)
-  example_results = re.sub(' FAIL',' \tFAIL',example_results)
-  summary_file.write('unit test results   \t{}\n'.format(unit_results))
-  summary_file.write('system test results \t{}\n'.format(system_results))
-  summary_file.write('example test results \t{}\n\n'.format(example_results))
+        
+  unit_results, system_results, example_results = sanitize_test_results([unit_results, system_results, example_results])
+  summary_file.write('unit test results   \t{}\n'
+                     .format(unit_results))
+  summary_file.write('system test results \t{}\n'
+                     .format(system_results))
+  summary_file.write('example test results \t{}\n\n'
+                     .format(example_results))
   summary_file.write('\n===================================================================\n')
   summary_file.write('\n\n{}\n\n'.format(make_info))
   summary_file.write('\n===================================================================\n')
