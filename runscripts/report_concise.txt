@@ -1,0 +1,32 @@
+path is /glade/scratch/rlong/esmf-testing/esmf-test-scripts/python_scripts
+python3 /glade/scratch/rlong/esmf-testing/esmf-test-scripts/python_scripts/archive_results.py -j 1234 -b intel_18.0.5_mpt_O_develop -m cheyenne -s pbs -t /glade/scratch/rlong/esmf-testing -a /glade/u/home/rlong/scratch/esmf-testing/esmf-test-artifacts -M 2.19 -B develop -d True
+python3 /glade/scratch/rlong/esmf-testing/esmf-test-scripts/python_scripts/archive_results.py -j 1234 -b intel_18.0.5_mpt_O_develop -m cheyenne -s pbs -t /glade/scratch/rlong/esmf-testing -a /glade/u/home/rlong/scratch/esmf-testing/esmf-test-artifacts -M 2.19 -B develop -d True
+python3 /glade/scratch/rlong/esmf-testing/esmf-test-scripts/python_scripts/archive_results.py -j 1234 -b intel_18.0.5_openmpi_O_develop -m cheyenne -s pbs -t /glade/scratch/rlong/esmf-testing -a /glade/u/home/rlong/scratch/esmf-testing/esmf-test-artifacts -M 3.1.4 -B develop -d True
+python3 /glade/scratch/rlong/esmf-testing/esmf-test-scripts/python_scripts/archive_results.py -j 1234 -b intel_18.0.5_openmpi_O_develop -m cheyenne -s pbs -t /glade/scratch/rlong/esmf-testing -a /glade/u/home/rlong/scratch/esmf-testing/esmf-test-artifacts -M 3.1.4 -B develop -d True
+python3 /glade/scratch/rlong/esmf-testing/esmf-test-scripts/python_scripts/archive_results.py -j 1234 -b intel_18.0.5_intelmpi_O_develop -m cheyenne -s pbs -t /glade/scratch/rlong/esmf-testing -a /glade/u/home/rlong/scratch/esmf-testing/esmf-test-artifacts -M 2018.4.274 -B develop -d True
+python3 /glade/scratch/rlong/esmf-testing/esmf-test-scripts/python_scripts/archive_results.py -j 1234 -b intel_18.0.5_intelmpi_O_develop -m cheyenne -s pbs -t /glade/scratch/rlong/esmf-testing -a /glade/u/home/rlong/scratch/esmf-testing/esmf-test-artifacts -M 2018.4.274 -B develop -d True
+python3 /glade/scratch/rlong/esmf-testing/esmf-test-scripts/python_scripts/archive_results.py -j 1234 -b intel_18.0.5_mpt_g_develop -m cheyenne -s pbs -t /glade/scratch/rlong/esmf-testing -a /glade/u/home/rlong/scratch/esmf-testing/esmf-test-artifacts -M 2.19 -B develop -d True
+python3 /glade/scratch/rlong/esmf-testing/esmf-test-scripts/python_scripts/archive_results.py -j 1234 -b intel_18.0.5_mpt_g_develop -m cheyenne -s pbs -t /glade/scratch/rlong/esmf-testing -a /glade/u/home/rlong/scratch/esmf-testing/esmf-test-artifacts -M 2.19 -B develop -d True
+python3 /glade/scratch/rlong/esmf-testing/esmf-test-scripts/python_scripts/archive_results.py -j 1234 -b intel_18.0.5_openmpi_g_develop -m cheyenne -s pbs -t /glade/scratch/rlong/esmf-testing -a /glade/u/home/rlong/scratch/esmf-testing/esmf-test-artifacts -M 3.1.4 -B develop -d True
+python3 /glade/scratch/rlong/esmf-testing/esmf-test-scripts/python_scripts/archive_results.py -j 1234 -b intel_18.0.5_openmpi_g_develop -m cheyenne -s pbs -t /glade/scratch/rlong/esmf-testing -a /glade/u/home/rlong/scratch/esmf-testing/esmf-test-artifacts -M 3.1.4 -B develop -d True
+python3 /glade/scratch/rlong/esmf-testing/esmf-test-scripts/python_scripts/archive_results.py -j 1234 -b intel_18.0.5_intelmpi_g_develop -m cheyenne -s pbs -t /glade/scratch/rlong/esmf-testing -a /glade/u/home/rlong/scratch/esmf-testing/esmf-test-artifacts -M 2018.4.274 -B develop -d True
+python3 /glade/scratch/rlong/esmf-testing/esmf-test-scripts/python_scripts/archive_results.py -j 1234 -b intel_18.0.5_intelmpi_g_develop -m cheyenne -s pbs -t /glade/scratch/rlong/esmf-testing -a /glade/u/home/rlong/scratch/esmf-testing/esmf-test-artifacts -M 2018.4.274 -B develop -d True
+filename: ./esmf-test-scripts/python_scripts/noscheduler.py, modulename: noscheduler, funcname: <module>
+filename: ./esmf-test-scripts/python_scripts/noscheduler.py, modulename: noscheduler, funcname: NoScheduler
+filename: ./esmf-test-scripts/python_scripts/pbs.py, modulename: pbs, funcname: <module>
+filename: ./esmf-test-scripts/python_scripts/pbs.py, modulename: pbs, funcname: pbs
+filename: ./esmf-test-scripts/python_scripts/pbs.py, modulename: pbs, funcname: pbs.__init__
+filename: ./esmf-test-scripts/python_scripts/pbs.py, modulename: pbs, funcname: pbs.createHeaders
+filename: ./esmf-test-scripts/python_scripts/pbs.py, modulename: pbs, funcname: pbs.submitJob
+filename: ./esmf-test-scripts/python_scripts/scheduler.py, modulename: scheduler, funcname: <module>
+filename: ./esmf-test-scripts/python_scripts/scheduler.py, modulename: scheduler, funcname: scheduler
+filename: ./esmf-test-scripts/python_scripts/slurm.py, modulename: slurm, funcname: <module>
+filename: ./esmf-test-scripts/python_scripts/slurm.py, modulename: slurm, funcname: slurm
+filename: ./esmf-test-scripts/python_scripts/test_esmf.py, modulename: test_esmf, funcname: <module>
+filename: ./esmf-test-scripts/python_scripts/test_esmf.py, modulename: test_esmf, funcname: ESMFTest
+filename: ./esmf-test-scripts/python_scripts/test_esmf.py, modulename: test_esmf, funcname: ESMFTest.__init__
+filename: ./esmf-test-scripts/python_scripts/test_esmf.py, modulename: test_esmf, funcname: ESMFTest.createGetResScripts
+filename: ./esmf-test-scripts/python_scripts/test_esmf.py, modulename: test_esmf, funcname: ESMFTest.createJobCardsAndSubmit
+filename: ./esmf-test-scripts/python_scripts/test_esmf.py, modulename: test_esmf, funcname: ESMFTest.createScripts
+filename: ./esmf-test-scripts/python_scripts/test_esmf.py, modulename: test_esmf, funcname: ESMFTest.readYAML
+filename: ./esmf-test-scripts/python_scripts/test_esmf.py, modulename: test_esmf, funcname: ESMFTest.updateRepo

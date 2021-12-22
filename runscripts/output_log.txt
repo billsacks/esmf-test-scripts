@@ -1,0 +1,63 @@
+Fetching origin
+Already up-to-date.
+setting dryrun to True
+path is /glade/scratch/rlong/esmf-testing/esmf-test-scripts/python_scripts
+calling readyaml
+HEY!!!! ./esmf-test-scripts/config/global.yaml
+set reclone to False
+machine name is cheyenne
+{'compiler': 'intel/18.0.5', 'netcdf': 'netcdf/4.6.3', 'mpi': {'mpt': {'module': 'mpt/2.19'}, 'openmpi': {'module': 'openmpi/3.1.4', 'pythontest': True}, 'intelmpi': {'module': 'impi/2018.4.274', 'pythontest': True}}}
+{'compiler': 'intel/18.0.5', 'netcdf': 'netcdf/4.6.3', 'mpi': {'mpt': {'module': 'mpt/2.19'}, 'openmpi': {'module': 'openmpi/3.1.4', 'pythontest': True}, 'intelmpi': {'module': 'impi/2018.4.274', 'pythontest': True}}}
+./esmf-test-scripts/config/rl_cheyenne.yaml /glade/u/home/rlong/scratch/esmf-testing/esmf-test-artifacts /glade/scratch/rlong/esmf-testing
+{'mpt': {'module': 'mpt/2.19'}, 'openmpi': {'module': 'openmpi/3.1.4', 'pythontest': True}, 'intelmpi': {'module': 'impi/2018.4.274', 'pythontest': True}}
+{'compiler': 'intel/18.0.5', 'netcdf': 'netcdf/4.6.3', 'mpi': {'mpt': {'module': 'mpt/2.19'}, 'openmpi': {'module': 'openmpi/3.1.4', 'pythontest': True}, 'intelmpi': {'module': 'impi/2018.4.274', 'pythontest': True}}}
+would have executed git clone -b develop git@github.com:esmf-org/esmf intel_18.0.5_mpt_O_develop
+would have executed git clone -b develop git@github.com:esmf-org/nuopc-app-prototypes
+would have cd'd to intel_18.0.5_mpt_O_develop
+qsub build-intel_18.0.5_mpt_O.bat
+Submitting batch_build with command: qsub build-intel_18.0.5_mpt_O.bat, jobnum is 1234
+python3 /glade/scratch/rlong/esmf-testing/esmf-test-scripts/python_scripts/archive_results.py -j 1234 -b intel_18.0.5_mpt_O_develop -m cheyenne -s pbs -t /glade/scratch/rlong/esmf-testing -a /glade/u/home/rlong/scratch/esmf-testing/esmf-test-artifacts -M 2.19 -B develop -d True
+Submitting test_batch with command: qsub -W depend=afterok:1234 test-intel_18.0.5_mpt_O.bat
+python3 /glade/scratch/rlong/esmf-testing/esmf-test-scripts/python_scripts/archive_results.py -j 1234 -b intel_18.0.5_mpt_O_develop -m cheyenne -s pbs -t /glade/scratch/rlong/esmf-testing -a /glade/u/home/rlong/scratch/esmf-testing/esmf-test-artifacts -M 2.19 -B develop -d True
+would have executed git clone -b develop git@github.com:esmf-org/esmf intel_18.0.5_openmpi_O_develop
+would have executed git clone -b develop git@github.com:esmf-org/nuopc-app-prototypes
+would have cd'd to intel_18.0.5_openmpi_O_develop
+qsub build-intel_18.0.5_openmpi_O.bat
+Submitting batch_build with command: qsub build-intel_18.0.5_openmpi_O.bat, jobnum is 1234
+python3 /glade/scratch/rlong/esmf-testing/esmf-test-scripts/python_scripts/archive_results.py -j 1234 -b intel_18.0.5_openmpi_O_develop -m cheyenne -s pbs -t /glade/scratch/rlong/esmf-testing -a /glade/u/home/rlong/scratch/esmf-testing/esmf-test-artifacts -M 3.1.4 -B develop -d True
+Submitting test_batch with command: qsub -W depend=afterok:1234 test-intel_18.0.5_openmpi_O.bat
+python3 /glade/scratch/rlong/esmf-testing/esmf-test-scripts/python_scripts/archive_results.py -j 1234 -b intel_18.0.5_openmpi_O_develop -m cheyenne -s pbs -t /glade/scratch/rlong/esmf-testing -a /glade/u/home/rlong/scratch/esmf-testing/esmf-test-artifacts -M 3.1.4 -B develop -d True
+would have executed git clone -b develop git@github.com:esmf-org/esmf intel_18.0.5_intelmpi_O_develop
+would have executed git clone -b develop git@github.com:esmf-org/nuopc-app-prototypes
+would have cd'd to intel_18.0.5_intelmpi_O_develop
+qsub build-intel_18.0.5_intelmpi_O.bat
+Submitting batch_build with command: qsub build-intel_18.0.5_intelmpi_O.bat, jobnum is 1234
+python3 /glade/scratch/rlong/esmf-testing/esmf-test-scripts/python_scripts/archive_results.py -j 1234 -b intel_18.0.5_intelmpi_O_develop -m cheyenne -s pbs -t /glade/scratch/rlong/esmf-testing -a /glade/u/home/rlong/scratch/esmf-testing/esmf-test-artifacts -M 2018.4.274 -B develop -d True
+Submitting test_batch with command: qsub -W depend=afterok:1234 test-intel_18.0.5_intelmpi_O.bat
+python3 /glade/scratch/rlong/esmf-testing/esmf-test-scripts/python_scripts/archive_results.py -j 1234 -b intel_18.0.5_intelmpi_O_develop -m cheyenne -s pbs -t /glade/scratch/rlong/esmf-testing -a /glade/u/home/rlong/scratch/esmf-testing/esmf-test-artifacts -M 2018.4.274 -B develop -d True
+{'mpt': {'module': 'mpt/2.19'}, 'openmpi': {'module': 'openmpi/3.1.4', 'pythontest': True}, 'intelmpi': {'module': 'impi/2018.4.274', 'pythontest': True}}
+{'compiler': 'intel/18.0.5', 'netcdf': 'netcdf/4.6.3', 'mpi': {'mpt': {'module': 'mpt/2.19'}, 'openmpi': {'module': 'openmpi/3.1.4', 'pythontest': True}, 'intelmpi': {'module': 'impi/2018.4.274', 'pythontest': True}}}
+would have executed git clone -b develop git@github.com:esmf-org/esmf intel_18.0.5_mpt_g_develop
+would have executed git clone -b develop git@github.com:esmf-org/nuopc-app-prototypes
+would have cd'd to intel_18.0.5_mpt_g_develop
+qsub build-intel_18.0.5_mpt_g.bat
+Submitting batch_build with command: qsub build-intel_18.0.5_mpt_g.bat, jobnum is 1234
+python3 /glade/scratch/rlong/esmf-testing/esmf-test-scripts/python_scripts/archive_results.py -j 1234 -b intel_18.0.5_mpt_g_develop -m cheyenne -s pbs -t /glade/scratch/rlong/esmf-testing -a /glade/u/home/rlong/scratch/esmf-testing/esmf-test-artifacts -M 2.19 -B develop -d True
+Submitting test_batch with command: qsub -W depend=afterok:1234 test-intel_18.0.5_mpt_g.bat
+python3 /glade/scratch/rlong/esmf-testing/esmf-test-scripts/python_scripts/archive_results.py -j 1234 -b intel_18.0.5_mpt_g_develop -m cheyenne -s pbs -t /glade/scratch/rlong/esmf-testing -a /glade/u/home/rlong/scratch/esmf-testing/esmf-test-artifacts -M 2.19 -B develop -d True
+would have executed git clone -b develop git@github.com:esmf-org/esmf intel_18.0.5_openmpi_g_develop
+would have executed git clone -b develop git@github.com:esmf-org/nuopc-app-prototypes
+would have cd'd to intel_18.0.5_openmpi_g_develop
+qsub build-intel_18.0.5_openmpi_g.bat
+Submitting batch_build with command: qsub build-intel_18.0.5_openmpi_g.bat, jobnum is 1234
+python3 /glade/scratch/rlong/esmf-testing/esmf-test-scripts/python_scripts/archive_results.py -j 1234 -b intel_18.0.5_openmpi_g_develop -m cheyenne -s pbs -t /glade/scratch/rlong/esmf-testing -a /glade/u/home/rlong/scratch/esmf-testing/esmf-test-artifacts -M 3.1.4 -B develop -d True
+Submitting test_batch with command: qsub -W depend=afterok:1234 test-intel_18.0.5_openmpi_g.bat
+python3 /glade/scratch/rlong/esmf-testing/esmf-test-scripts/python_scripts/archive_results.py -j 1234 -b intel_18.0.5_openmpi_g_develop -m cheyenne -s pbs -t /glade/scratch/rlong/esmf-testing -a /glade/u/home/rlong/scratch/esmf-testing/esmf-test-artifacts -M 3.1.4 -B develop -d True
+would have executed git clone -b develop git@github.com:esmf-org/esmf intel_18.0.5_intelmpi_g_develop
+would have executed git clone -b develop git@github.com:esmf-org/nuopc-app-prototypes
+would have cd'd to intel_18.0.5_intelmpi_g_develop
+qsub build-intel_18.0.5_intelmpi_g.bat
+Submitting batch_build with command: qsub build-intel_18.0.5_intelmpi_g.bat, jobnum is 1234
+python3 /glade/scratch/rlong/esmf-testing/esmf-test-scripts/python_scripts/archive_results.py -j 1234 -b intel_18.0.5_intelmpi_g_develop -m cheyenne -s pbs -t /glade/scratch/rlong/esmf-testing -a /glade/u/home/rlong/scratch/esmf-testing/esmf-test-artifacts -M 2018.4.274 -B develop -d True
+Submitting test_batch with command: qsub -W depend=afterok:1234 test-intel_18.0.5_intelmpi_g.bat
+python3 /glade/scratch/rlong/esmf-testing/esmf-test-scripts/python_scripts/archive_results.py -j 1234 -b intel_18.0.5_intelmpi_g_develop -m cheyenne -s pbs -t /glade/scratch/rlong/esmf-testing -a /glade/u/home/rlong/scratch/esmf-testing/esmf-test-artifacts -M 2018.4.274 -B develop -d True

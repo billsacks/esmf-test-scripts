@@ -1,0 +1,591 @@
+Fetching origin
+Already up-to-date.
+setting dryrun to True
+path is /glade/scratch/rlong/esmf-testing/esmf-test-scripts/python_scripts
+calling readyaml
+HEY!!!! ./esmf-test-scripts/config/global.yaml
+set reclone to False
+machine name is cheyenne
+{'compiler': 'intel/18.0.5', 'netcdf': 'netcdf/4.6.3', 'mpi': {'mpt': {'module': 'mpt/2.19'}, 'openmpi': {'module': 'openmpi/3.1.4', 'pythontest': True}, 'intelmpi': {'module': 'impi/2018.4.274', 'pythontest': True}}}
+{'compiler': 'intel/18.0.5', 'netcdf': 'netcdf/4.6.3', 'mpi': {'mpt': {'module': 'mpt/2.19'}, 'openmpi': {'module': 'openmpi/3.1.4', 'pythontest': True}, 'intelmpi': {'module': 'impi/2018.4.274', 'pythontest': True}}}
+./esmf-test-scripts/config/rl_cheyenne.yaml /glade/u/home/rlong/scratch/esmf-testing/esmf-test-artifacts /glade/scratch/rlong/esmf-testing
+{'mpt': {'module': 'mpt/2.19'}, 'openmpi': {'module': 'openmpi/3.1.4', 'pythontest': True}, 'intelmpi': {'module': 'impi/2018.4.274', 'pythontest': True}}
+{'compiler': 'intel/18.0.5', 'netcdf': 'netcdf/4.6.3', 'mpi': {'mpt': {'module': 'mpt/2.19'}, 'openmpi': {'module': 'openmpi/3.1.4', 'pythontest': True}, 'intelmpi': {'module': 'impi/2018.4.274', 'pythontest': True}}}
+would have executed git clone -b develop git@github.com:esmf-org/esmf intel_18.0.5_mpt_O_develop
+would have executed git clone -b develop git@github.com:esmf-org/nuopc-app-prototypes
+would have cd'd to intel_18.0.5_mpt_O_develop
+qsub build-intel_18.0.5_mpt_O.bat
+Submitting batch_build with command: qsub build-intel_18.0.5_mpt_O.bat, jobnum is 1234
+python3 /glade/scratch/rlong/esmf-testing/esmf-test-scripts/python_scripts/archive_results.py -j 1234 -b intel_18.0.5_mpt_O_develop -m cheyenne -s pbs -t /glade/scratch/rlong/esmf-testing -a /glade/u/home/rlong/scratch/esmf-testing/esmf-test-artifacts -M 2.19 -B develop -d True
+Submitting test_batch with command: qsub -W depend=afterok:1234 test-intel_18.0.5_mpt_O.bat
+python3 /glade/scratch/rlong/esmf-testing/esmf-test-scripts/python_scripts/archive_results.py -j 1234 -b intel_18.0.5_mpt_O_develop -m cheyenne -s pbs -t /glade/scratch/rlong/esmf-testing -a /glade/u/home/rlong/scratch/esmf-testing/esmf-test-artifacts -M 2.19 -B develop -d True
+would have executed git clone -b develop git@github.com:esmf-org/esmf intel_18.0.5_openmpi_O_develop
+would have executed git clone -b develop git@github.com:esmf-org/nuopc-app-prototypes
+would have cd'd to intel_18.0.5_openmpi_O_develop
+qsub build-intel_18.0.5_openmpi_O.bat
+Submitting batch_build with command: qsub build-intel_18.0.5_openmpi_O.bat, jobnum is 1234
+python3 /glade/scratch/rlong/esmf-testing/esmf-test-scripts/python_scripts/archive_results.py -j 1234 -b intel_18.0.5_openmpi_O_develop -m cheyenne -s pbs -t /glade/scratch/rlong/esmf-testing -a /glade/u/home/rlong/scratch/esmf-testing/esmf-test-artifacts -M 3.1.4 -B develop -d True
+Submitting test_batch with command: qsub -W depend=afterok:1234 test-intel_18.0.5_openmpi_O.bat
+python3 /glade/scratch/rlong/esmf-testing/esmf-test-scripts/python_scripts/archive_results.py -j 1234 -b intel_18.0.5_openmpi_O_develop -m cheyenne -s pbs -t /glade/scratch/rlong/esmf-testing -a /glade/u/home/rlong/scratch/esmf-testing/esmf-test-artifacts -M 3.1.4 -B develop -d True
+would have executed git clone -b develop git@github.com:esmf-org/esmf intel_18.0.5_intelmpi_O_develop
+would have executed git clone -b develop git@github.com:esmf-org/nuopc-app-prototypes
+would have cd'd to intel_18.0.5_intelmpi_O_develop
+qsub build-intel_18.0.5_intelmpi_O.bat
+Submitting batch_build with command: qsub build-intel_18.0.5_intelmpi_O.bat, jobnum is 1234
+python3 /glade/scratch/rlong/esmf-testing/esmf-test-scripts/python_scripts/archive_results.py -j 1234 -b intel_18.0.5_intelmpi_O_develop -m cheyenne -s pbs -t /glade/scratch/rlong/esmf-testing -a /glade/u/home/rlong/scratch/esmf-testing/esmf-test-artifacts -M 2018.4.274 -B develop -d True
+Submitting test_batch with command: qsub -W depend=afterok:1234 test-intel_18.0.5_intelmpi_O.bat
+python3 /glade/scratch/rlong/esmf-testing/esmf-test-scripts/python_scripts/archive_results.py -j 1234 -b intel_18.0.5_intelmpi_O_develop -m cheyenne -s pbs -t /glade/scratch/rlong/esmf-testing -a /glade/u/home/rlong/scratch/esmf-testing/esmf-test-artifacts -M 2018.4.274 -B develop -d True
+{'mpt': {'module': 'mpt/2.19'}, 'openmpi': {'module': 'openmpi/3.1.4', 'pythontest': True}, 'intelmpi': {'module': 'impi/2018.4.274', 'pythontest': True}}
+{'compiler': 'intel/18.0.5', 'netcdf': 'netcdf/4.6.3', 'mpi': {'mpt': {'module': 'mpt/2.19'}, 'openmpi': {'module': 'openmpi/3.1.4', 'pythontest': True}, 'intelmpi': {'module': 'impi/2018.4.274', 'pythontest': True}}}
+would have executed git clone -b develop git@github.com:esmf-org/esmf intel_18.0.5_mpt_g_develop
+would have executed git clone -b develop git@github.com:esmf-org/nuopc-app-prototypes
+would have cd'd to intel_18.0.5_mpt_g_develop
+qsub build-intel_18.0.5_mpt_g.bat
+Submitting batch_build with command: qsub build-intel_18.0.5_mpt_g.bat, jobnum is 1234
+python3 /glade/scratch/rlong/esmf-testing/esmf-test-scripts/python_scripts/archive_results.py -j 1234 -b intel_18.0.5_mpt_g_develop -m cheyenne -s pbs -t /glade/scratch/rlong/esmf-testing -a /glade/u/home/rlong/scratch/esmf-testing/esmf-test-artifacts -M 2.19 -B develop -d True
+Submitting test_batch with command: qsub -W depend=afterok:1234 test-intel_18.0.5_mpt_g.bat
+python3 /glade/scratch/rlong/esmf-testing/esmf-test-scripts/python_scripts/archive_results.py -j 1234 -b intel_18.0.5_mpt_g_develop -m cheyenne -s pbs -t /glade/scratch/rlong/esmf-testing -a /glade/u/home/rlong/scratch/esmf-testing/esmf-test-artifacts -M 2.19 -B develop -d True
+would have executed git clone -b develop git@github.com:esmf-org/esmf intel_18.0.5_openmpi_g_develop
+would have executed git clone -b develop git@github.com:esmf-org/nuopc-app-prototypes
+would have cd'd to intel_18.0.5_openmpi_g_develop
+qsub build-intel_18.0.5_openmpi_g.bat
+Submitting batch_build with command: qsub build-intel_18.0.5_openmpi_g.bat, jobnum is 1234
+python3 /glade/scratch/rlong/esmf-testing/esmf-test-scripts/python_scripts/archive_results.py -j 1234 -b intel_18.0.5_openmpi_g_develop -m cheyenne -s pbs -t /glade/scratch/rlong/esmf-testing -a /glade/u/home/rlong/scratch/esmf-testing/esmf-test-artifacts -M 3.1.4 -B develop -d True
+Submitting test_batch with command: qsub -W depend=afterok:1234 test-intel_18.0.5_openmpi_g.bat
+python3 /glade/scratch/rlong/esmf-testing/esmf-test-scripts/python_scripts/archive_results.py -j 1234 -b intel_18.0.5_openmpi_g_develop -m cheyenne -s pbs -t /glade/scratch/rlong/esmf-testing -a /glade/u/home/rlong/scratch/esmf-testing/esmf-test-artifacts -M 3.1.4 -B develop -d True
+would have executed git clone -b develop git@github.com:esmf-org/esmf intel_18.0.5_intelmpi_g_develop
+would have executed git clone -b develop git@github.com:esmf-org/nuopc-app-prototypes
+would have cd'd to intel_18.0.5_intelmpi_g_develop
+qsub build-intel_18.0.5_intelmpi_g.bat
+Submitting batch_build with command: qsub build-intel_18.0.5_intelmpi_g.bat, jobnum is 1234
+python3 /glade/scratch/rlong/esmf-testing/esmf-test-scripts/python_scripts/archive_results.py -j 1234 -b intel_18.0.5_intelmpi_g_develop -m cheyenne -s pbs -t /glade/scratch/rlong/esmf-testing -a /glade/u/home/rlong/scratch/esmf-testing/esmf-test-artifacts -M 2018.4.274 -B develop -d True
+Submitting test_batch with command: qsub -W depend=afterok:1234 test-intel_18.0.5_intelmpi_g.bat
+python3 /glade/scratch/rlong/esmf-testing/esmf-test-scripts/python_scripts/archive_results.py -j 1234 -b intel_18.0.5_intelmpi_g_develop -m cheyenne -s pbs -t /glade/scratch/rlong/esmf-testing -a /glade/u/home/rlong/scratch/esmf-testing/esmf-test-artifacts -M 2018.4.274 -B develop -d True
+
+functions called:
+filename: ./esmf-test-scripts/python_scripts/noscheduler.py, modulename: noscheduler, funcname: <module>
+filename: ./esmf-test-scripts/python_scripts/noscheduler.py, modulename: noscheduler, funcname: NoScheduler
+filename: ./esmf-test-scripts/python_scripts/pbs.py, modulename: pbs, funcname: <module>
+filename: ./esmf-test-scripts/python_scripts/pbs.py, modulename: pbs, funcname: pbs
+filename: ./esmf-test-scripts/python_scripts/pbs.py, modulename: pbs, funcname: pbs.__init__
+filename: ./esmf-test-scripts/python_scripts/pbs.py, modulename: pbs, funcname: pbs.createHeaders
+filename: ./esmf-test-scripts/python_scripts/pbs.py, modulename: pbs, funcname: pbs.submitJob
+filename: ./esmf-test-scripts/python_scripts/scheduler.py, modulename: scheduler, funcname: <module>
+filename: ./esmf-test-scripts/python_scripts/scheduler.py, modulename: scheduler, funcname: scheduler
+filename: ./esmf-test-scripts/python_scripts/slurm.py, modulename: slurm, funcname: <module>
+filename: ./esmf-test-scripts/python_scripts/slurm.py, modulename: slurm, funcname: slurm
+filename: ./esmf-test-scripts/python_scripts/test_esmf.py, modulename: test_esmf, funcname: <module>
+filename: ./esmf-test-scripts/python_scripts/test_esmf.py, modulename: test_esmf, funcname: ESMFTest
+filename: ./esmf-test-scripts/python_scripts/test_esmf.py, modulename: test_esmf, funcname: ESMFTest.__init__
+filename: ./esmf-test-scripts/python_scripts/test_esmf.py, modulename: test_esmf, funcname: ESMFTest.createGetResScripts
+filename: ./esmf-test-scripts/python_scripts/test_esmf.py, modulename: test_esmf, funcname: ESMFTest.createJobCardsAndSubmit
+filename: ./esmf-test-scripts/python_scripts/test_esmf.py, modulename: test_esmf, funcname: ESMFTest.createScripts
+filename: ./esmf-test-scripts/python_scripts/test_esmf.py, modulename: test_esmf, funcname: ESMFTest.readYAML
+filename: ./esmf-test-scripts/python_scripts/test_esmf.py, modulename: test_esmf, funcname: ESMFTest.updateRepo
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/_bootlocale.py, modulename: _bootlocale, funcname: getpreferredencoding
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/_collections_abc.py, modulename: _collections_abc, funcname: Mapping.get
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/_collections_abc.py, modulename: _collections_abc, funcname: __subclasshook__
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/_collections_abc.py, modulename: _collections_abc, funcname: _check_methods
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/abc.py, modulename: abc, funcname: ABCMeta.__instancecheck__
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/abc.py, modulename: abc, funcname: ABCMeta.__subclasscheck__
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/abc.py, modulename: abc, funcname: ABCMeta.register
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/abc.py, modulename: abc, funcname: __new__
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/abc.py, modulename: abc, funcname: abstractmethod
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/argparse.py, modulename: argparse, funcname: <listcomp>
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/argparse.py, modulename: argparse, funcname: Action.__init__
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/argparse.py, modulename: argparse, funcname: ArgumentParser.__init__
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/argparse.py, modulename: argparse, funcname: ArgumentParser._add_action
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/argparse.py, modulename: argparse, funcname: ArgumentParser._check_value
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/argparse.py, modulename: argparse, funcname: ArgumentParser._get_formatter
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/argparse.py, modulename: argparse, funcname: ArgumentParser._get_nargs_pattern
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/argparse.py, modulename: argparse, funcname: ArgumentParser._get_positional_actions
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/argparse.py, modulename: argparse, funcname: ArgumentParser._get_value
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/argparse.py, modulename: argparse, funcname: ArgumentParser._get_values
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/argparse.py, modulename: argparse, funcname: ArgumentParser._match_argument
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/argparse.py, modulename: argparse, funcname: ArgumentParser._match_arguments_partial
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/argparse.py, modulename: argparse, funcname: ArgumentParser._parse_known_args
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/argparse.py, modulename: argparse, funcname: ArgumentParser._parse_optional
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/argparse.py, modulename: argparse, funcname: ArgumentParser.parse_args
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/argparse.py, modulename: argparse, funcname: ArgumentParser.parse_known_args
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/argparse.py, modulename: argparse, funcname: HelpFormatter.__init__
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/argparse.py, modulename: argparse, funcname: HelpFormatter._format_args
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/argparse.py, modulename: argparse, funcname: HelpFormatter._metavar_formatter
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/argparse.py, modulename: argparse, funcname: Namespace.__init__
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/argparse.py, modulename: argparse, funcname: _ActionsContainer.__init__
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/argparse.py, modulename: argparse, funcname: _ActionsContainer._add_action
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/argparse.py, modulename: argparse, funcname: _ActionsContainer._check_conflict
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/argparse.py, modulename: argparse, funcname: _ActionsContainer._get_handler
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/argparse.py, modulename: argparse, funcname: _ActionsContainer._get_optional_kwargs
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/argparse.py, modulename: argparse, funcname: _ActionsContainer._pop_action_class
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/argparse.py, modulename: argparse, funcname: _ActionsContainer._registry_get
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/argparse.py, modulename: argparse, funcname: _ActionsContainer.add_argument
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/argparse.py, modulename: argparse, funcname: _ActionsContainer.add_argument_group
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/argparse.py, modulename: argparse, funcname: _ActionsContainer.register
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/argparse.py, modulename: argparse, funcname: _ArgumentGroup.__init__
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/argparse.py, modulename: argparse, funcname: _ArgumentGroup._add_action
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/argparse.py, modulename: argparse, funcname: _HelpAction.__init__
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/argparse.py, modulename: argparse, funcname: _Section.__init__
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/argparse.py, modulename: argparse, funcname: _StoreAction.__call__
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/argparse.py, modulename: argparse, funcname: _StoreAction.__init__
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/argparse.py, modulename: argparse, funcname: consume_optional
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/argparse.py, modulename: argparse, funcname: consume_positionals
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/argparse.py, modulename: argparse, funcname: format
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/argparse.py, modulename: argparse, funcname: identity
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/argparse.py, modulename: argparse, funcname: take_action
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/base64.py, modulename: base64, funcname: <module>
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/codecs.py, modulename: codecs, funcname: BufferedIncrementalDecoder.__init__
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/codecs.py, modulename: codecs, funcname: BufferedIncrementalDecoder.decode
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/codecs.py, modulename: codecs, funcname: BufferedIncrementalDecoder.getstate
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/codecs.py, modulename: codecs, funcname: IncrementalDecoder.__init__
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/codecs.py, modulename: codecs, funcname: IncrementalEncoder.__init__
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/collections/__init__.py, modulename: __init__, funcname: <genexpr>
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/collections/__init__.py, modulename: __init__, funcname: namedtuple
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/datetime.py, modulename: datetime, funcname: <module>
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/datetime.py, modulename: datetime, funcname: __new__
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/datetime.py, modulename: datetime, funcname: _check_date_fields
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/datetime.py, modulename: datetime, funcname: _check_int_field
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/datetime.py, modulename: datetime, funcname: _check_time_fields
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/datetime.py, modulename: datetime, funcname: _check_tzinfo_arg
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/datetime.py, modulename: datetime, funcname: _create
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/datetime.py, modulename: datetime, funcname: _days_before_year
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/datetime.py, modulename: datetime, funcname: _days_in_month
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/datetime.py, modulename: datetime, funcname: date
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/datetime.py, modulename: datetime, funcname: datetime
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/datetime.py, modulename: datetime, funcname: time
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/datetime.py, modulename: datetime, funcname: timedelta
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/datetime.py, modulename: datetime, funcname: timedelta.__neg__
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/datetime.py, modulename: datetime, funcname: timezone
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/datetime.py, modulename: datetime, funcname: tzinfo
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/encodings/__init__.py, modulename: __init__, funcname: normalize_encoding
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/enum.py, modulename: enum, funcname: <dictcomp>
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/enum.py, modulename: enum, funcname: <genexpr>
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/enum.py, modulename: enum, funcname: <lambda>
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/enum.py, modulename: enum, funcname: <listcomp>
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/enum.py, modulename: enum, funcname: <setcomp>
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/enum.py, modulename: enum, funcname: EnumMeta.__call__
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/enum.py, modulename: enum, funcname: EnumMeta.__getattr__
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/enum.py, modulename: enum, funcname: EnumMeta.__setattr__
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/enum.py, modulename: enum, funcname: EnumMeta._create_
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/enum.py, modulename: enum, funcname: IntFlag.__and__
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/enum.py, modulename: enum, funcname: _EnumDict.__init__
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/enum.py, modulename: enum, funcname: _EnumDict.__setitem__
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/enum.py, modulename: enum, funcname: __members__
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/enum.py, modulename: enum, funcname: __new__
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/enum.py, modulename: enum, funcname: __prepare__
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/enum.py, modulename: enum, funcname: _convert
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/enum.py, modulename: enum, funcname: _find_data_type
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/enum.py, modulename: enum, funcname: _find_new_
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/enum.py, modulename: enum, funcname: _get_mixins_
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/enum.py, modulename: enum, funcname: _is_descriptor
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/enum.py, modulename: enum, funcname: _is_dunder
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/enum.py, modulename: enum, funcname: _is_sunder
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/enum.py, modulename: enum, funcname: value
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/fnmatch.py, modulename: fnmatch, funcname: <module>
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/functools.py, modulename: functools, funcname: decorating_function
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/functools.py, modulename: functools, funcname: lru_cache
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/functools.py, modulename: functools, funcname: update_wrapper
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/functools.py, modulename: functools, funcname: wraps
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/genericpath.py, modulename: genericpath, funcname: exists
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/genericpath.py, modulename: genericpath, funcname: isdir
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/gettext.py, modulename: gettext, funcname: _expand_lang
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/gettext.py, modulename: gettext, funcname: dgettext
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/gettext.py, modulename: gettext, funcname: find
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/gettext.py, modulename: gettext, funcname: gettext
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/gettext.py, modulename: gettext, funcname: translation
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/locale.py, modulename: locale, funcname: _replace_encoding
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/locale.py, modulename: locale, funcname: normalize
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/ntpath.py, modulename: ntpath, funcname: <module>
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/os.py, modulename: os, funcname: _Environ.__getitem__
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/os.py, modulename: os, funcname: __subclasshook__
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/os.py, modulename: os, funcname: decode
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/os.py, modulename: os, funcname: encode
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/pathlib.py, modulename: pathlib, funcname: <module>
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/pathlib.py, modulename: pathlib, funcname: <setcomp>
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/pathlib.py, modulename: pathlib, funcname: Path
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/pathlib.py, modulename: pathlib, funcname: Path._init
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/pathlib.py, modulename: pathlib, funcname: Path.absolute
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/pathlib.py, modulename: pathlib, funcname: PosixPath
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/pathlib.py, modulename: pathlib, funcname: PurePath
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/pathlib.py, modulename: pathlib, funcname: PurePath.__str__
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/pathlib.py, modulename: pathlib, funcname: PurePath.is_absolute
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/pathlib.py, modulename: pathlib, funcname: PurePosixPath
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/pathlib.py, modulename: pathlib, funcname: PureWindowsPath
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/pathlib.py, modulename: pathlib, funcname: WindowsPath
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/pathlib.py, modulename: pathlib, funcname: _Accessor
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/pathlib.py, modulename: pathlib, funcname: _Flavour
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/pathlib.py, modulename: pathlib, funcname: _Flavour.__init__
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/pathlib.py, modulename: pathlib, funcname: _Flavour.parse_parts
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/pathlib.py, modulename: pathlib, funcname: _NormalAccessor
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/pathlib.py, modulename: pathlib, funcname: _PathParents
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/pathlib.py, modulename: pathlib, funcname: _PosixFlavour
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/pathlib.py, modulename: pathlib, funcname: _PosixFlavour.splitroot
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/pathlib.py, modulename: pathlib, funcname: _PreciseSelector
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/pathlib.py, modulename: pathlib, funcname: _RecursiveWildcardSelector
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/pathlib.py, modulename: pathlib, funcname: _Selector
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/pathlib.py, modulename: pathlib, funcname: _TerminatingSelector
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/pathlib.py, modulename: pathlib, funcname: _WildcardSelector
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/pathlib.py, modulename: pathlib, funcname: _WindowsFlavour
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/pathlib.py, modulename: pathlib, funcname: __new__
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/pathlib.py, modulename: pathlib, funcname: _format_parsed_parts
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/pathlib.py, modulename: pathlib, funcname: _from_parsed_parts
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/pathlib.py, modulename: pathlib, funcname: _from_parts
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/pathlib.py, modulename: pathlib, funcname: _parse_args
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/pathlib.py, modulename: pathlib, funcname: parent
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/posixpath.py, modulename: posixpath, funcname: _get_sep
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/posixpath.py, modulename: posixpath, funcname: basename
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/posixpath.py, modulename: posixpath, funcname: dirname
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/posixpath.py, modulename: posixpath, funcname: join
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/re.py, modulename: re, funcname: _compile
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/re.py, modulename: re, funcname: compile
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/re.py, modulename: re, funcname: match
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/re.py, modulename: re, funcname: sub
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/selectors.py, modulename: selectors, funcname: <module>
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/selectors.py, modulename: selectors, funcname: BaseSelector
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/selectors.py, modulename: selectors, funcname: EpollSelector
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/selectors.py, modulename: selectors, funcname: PollSelector
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/selectors.py, modulename: selectors, funcname: SelectSelector
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/selectors.py, modulename: selectors, funcname: _BaseSelectorImpl
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/selectors.py, modulename: selectors, funcname: _PollLikeSelector
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/selectors.py, modulename: selectors, funcname: _SelectorMapping
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/signal.py, modulename: signal, funcname: <lambda>
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/signal.py, modulename: signal, funcname: <module>
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/sre_compile.py, modulename: sre_compile, funcname: <listcomp>
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/sre_compile.py, modulename: sre_compile, funcname: _bytes_to_codes
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/sre_compile.py, modulename: sre_compile, funcname: _code
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/sre_compile.py, modulename: sre_compile, funcname: _combine_flags
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/sre_compile.py, modulename: sre_compile, funcname: _compile
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/sre_compile.py, modulename: sre_compile, funcname: _compile_charset
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/sre_compile.py, modulename: sre_compile, funcname: _compile_info
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/sre_compile.py, modulename: sre_compile, funcname: _generate_overlap_table
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/sre_compile.py, modulename: sre_compile, funcname: _get_charset_prefix
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/sre_compile.py, modulename: sre_compile, funcname: _get_iscased
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/sre_compile.py, modulename: sre_compile, funcname: _get_literal_prefix
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/sre_compile.py, modulename: sre_compile, funcname: _mk_bitmap
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/sre_compile.py, modulename: sre_compile, funcname: _optimize_charset
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/sre_compile.py, modulename: sre_compile, funcname: _simple
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/sre_compile.py, modulename: sre_compile, funcname: compile
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/sre_compile.py, modulename: sre_compile, funcname: isstring
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/sre_parse.py, modulename: sre_parse, funcname: Pattern.__init__
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/sre_parse.py, modulename: sre_parse, funcname: Pattern.closegroup
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/sre_parse.py, modulename: sre_parse, funcname: Pattern.opengroup
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/sre_parse.py, modulename: sre_parse, funcname: SubPattern.__delitem__
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/sre_parse.py, modulename: sre_parse, funcname: SubPattern.__getitem__
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/sre_parse.py, modulename: sre_parse, funcname: SubPattern.__init__
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/sre_parse.py, modulename: sre_parse, funcname: SubPattern.__len__
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/sre_parse.py, modulename: sre_parse, funcname: SubPattern.__setitem__
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/sre_parse.py, modulename: sre_parse, funcname: SubPattern.append
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/sre_parse.py, modulename: sre_parse, funcname: SubPattern.getwidth
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/sre_parse.py, modulename: sre_parse, funcname: Tokenizer.__init__
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/sre_parse.py, modulename: sre_parse, funcname: Tokenizer.__next
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/sre_parse.py, modulename: sre_parse, funcname: Tokenizer.get
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/sre_parse.py, modulename: sre_parse, funcname: Tokenizer.getuntil
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/sre_parse.py, modulename: sre_parse, funcname: Tokenizer.match
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/sre_parse.py, modulename: sre_parse, funcname: Tokenizer.tell
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/sre_parse.py, modulename: sre_parse, funcname: _class_escape
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/sre_parse.py, modulename: sre_parse, funcname: _escape
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/sre_parse.py, modulename: sre_parse, funcname: _parse
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/sre_parse.py, modulename: sre_parse, funcname: _parse_sub
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/sre_parse.py, modulename: sre_parse, funcname: _uniq
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/sre_parse.py, modulename: sre_parse, funcname: fix_flags
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/sre_parse.py, modulename: sre_parse, funcname: groups
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/sre_parse.py, modulename: sre_parse, funcname: parse
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/subprocess.py, modulename: subprocess, funcname: <module>
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/subprocess.py, modulename: subprocess, funcname: CalledProcessError
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/subprocess.py, modulename: subprocess, funcname: CompletedProcess
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/subprocess.py, modulename: subprocess, funcname: Popen
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/subprocess.py, modulename: subprocess, funcname: SubprocessError
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/subprocess.py, modulename: subprocess, funcname: TimeoutExpired
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/types.py, modulename: types, funcname: DynamicClassAttribute.__get__
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/urllib/__init__.py, modulename: __init__, funcname: <module>
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/urllib/parse.py, modulename: parse, funcname: <module>
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/urllib/parse.py, modulename: parse, funcname: DefragResult
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/urllib/parse.py, modulename: parse, funcname: DefragResultBytes
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/urllib/parse.py, modulename: parse, funcname: ParseResult
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/urllib/parse.py, modulename: parse, funcname: ParseResultBytes
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/urllib/parse.py, modulename: parse, funcname: Quoter
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/urllib/parse.py, modulename: parse, funcname: SplitResult
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/urllib/parse.py, modulename: parse, funcname: SplitResultBytes
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/urllib/parse.py, modulename: parse, funcname: _NetlocResultMixinBase
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/urllib/parse.py, modulename: parse, funcname: _NetlocResultMixinBytes
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/urllib/parse.py, modulename: parse, funcname: _NetlocResultMixinStr
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/urllib/parse.py, modulename: parse, funcname: _ResultMixinBytes
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/urllib/parse.py, modulename: parse, funcname: _ResultMixinStr
+filename: /glade/u/apps/ch/opt/python/3.7.9/gnu/9.1.0/lib/python3.7/urllib/parse.py, modulename: parse, funcname: _fix_result_transcoding
+filename: /glade/u/home/rlong/.local/lib/python3.7/site-packages/yaml/__init__.py, modulename: __init__, funcname: <module>
+filename: /glade/u/home/rlong/.local/lib/python3.7/site-packages/yaml/__init__.py, modulename: __init__, funcname: YAMLLoadWarning
+filename: /glade/u/home/rlong/.local/lib/python3.7/site-packages/yaml/__init__.py, modulename: __init__, funcname: YAMLObject
+filename: /glade/u/home/rlong/.local/lib/python3.7/site-packages/yaml/__init__.py, modulename: __init__, funcname: YAMLObjectMetaclass
+filename: /glade/u/home/rlong/.local/lib/python3.7/site-packages/yaml/__init__.py, modulename: __init__, funcname: YAMLObjectMetaclass.__init__
+filename: /glade/u/home/rlong/.local/lib/python3.7/site-packages/yaml/__init__.py, modulename: __init__, funcname: load
+filename: /glade/u/home/rlong/.local/lib/python3.7/site-packages/yaml/composer.py, modulename: composer, funcname: <module>
+filename: /glade/u/home/rlong/.local/lib/python3.7/site-packages/yaml/composer.py, modulename: composer, funcname: Composer
+filename: /glade/u/home/rlong/.local/lib/python3.7/site-packages/yaml/composer.py, modulename: composer, funcname: Composer.__init__
+filename: /glade/u/home/rlong/.local/lib/python3.7/site-packages/yaml/composer.py, modulename: composer, funcname: Composer.compose_document
+filename: /glade/u/home/rlong/.local/lib/python3.7/site-packages/yaml/composer.py, modulename: composer, funcname: Composer.compose_mapping_node
+filename: /glade/u/home/rlong/.local/lib/python3.7/site-packages/yaml/composer.py, modulename: composer, funcname: Composer.compose_node
+filename: /glade/u/home/rlong/.local/lib/python3.7/site-packages/yaml/composer.py, modulename: composer, funcname: Composer.compose_scalar_node
+filename: /glade/u/home/rlong/.local/lib/python3.7/site-packages/yaml/composer.py, modulename: composer, funcname: Composer.compose_sequence_node
+filename: /glade/u/home/rlong/.local/lib/python3.7/site-packages/yaml/composer.py, modulename: composer, funcname: Composer.get_single_node
+filename: /glade/u/home/rlong/.local/lib/python3.7/site-packages/yaml/composer.py, modulename: composer, funcname: ComposerError
+filename: /glade/u/home/rlong/.local/lib/python3.7/site-packages/yaml/constructor.py, modulename: constructor, funcname: <listcomp>
+filename: /glade/u/home/rlong/.local/lib/python3.7/site-packages/yaml/constructor.py, modulename: constructor, funcname: <module>
+filename: /glade/u/home/rlong/.local/lib/python3.7/site-packages/yaml/constructor.py, modulename: constructor, funcname: BaseConstructor
+filename: /glade/u/home/rlong/.local/lib/python3.7/site-packages/yaml/constructor.py, modulename: constructor, funcname: BaseConstructor.__init__
+filename: /glade/u/home/rlong/.local/lib/python3.7/site-packages/yaml/constructor.py, modulename: constructor, funcname: BaseConstructor.construct_document
+filename: /glade/u/home/rlong/.local/lib/python3.7/site-packages/yaml/constructor.py, modulename: constructor, funcname: BaseConstructor.construct_mapping
+filename: /glade/u/home/rlong/.local/lib/python3.7/site-packages/yaml/constructor.py, modulename: constructor, funcname: BaseConstructor.construct_object
+filename: /glade/u/home/rlong/.local/lib/python3.7/site-packages/yaml/constructor.py, modulename: constructor, funcname: BaseConstructor.construct_scalar
+filename: /glade/u/home/rlong/.local/lib/python3.7/site-packages/yaml/constructor.py, modulename: constructor, funcname: BaseConstructor.construct_sequence
+filename: /glade/u/home/rlong/.local/lib/python3.7/site-packages/yaml/constructor.py, modulename: constructor, funcname: BaseConstructor.get_single_data
+filename: /glade/u/home/rlong/.local/lib/python3.7/site-packages/yaml/constructor.py, modulename: constructor, funcname: Constructor
+filename: /glade/u/home/rlong/.local/lib/python3.7/site-packages/yaml/constructor.py, modulename: constructor, funcname: ConstructorError
+filename: /glade/u/home/rlong/.local/lib/python3.7/site-packages/yaml/constructor.py, modulename: constructor, funcname: FullConstructor
+filename: /glade/u/home/rlong/.local/lib/python3.7/site-packages/yaml/constructor.py, modulename: constructor, funcname: SafeConstructor
+filename: /glade/u/home/rlong/.local/lib/python3.7/site-packages/yaml/constructor.py, modulename: constructor, funcname: SafeConstructor.construct_mapping
+filename: /glade/u/home/rlong/.local/lib/python3.7/site-packages/yaml/constructor.py, modulename: constructor, funcname: SafeConstructor.construct_scalar
+filename: /glade/u/home/rlong/.local/lib/python3.7/site-packages/yaml/constructor.py, modulename: constructor, funcname: SafeConstructor.flatten_mapping
+filename: /glade/u/home/rlong/.local/lib/python3.7/site-packages/yaml/constructor.py, modulename: constructor, funcname: UnsafeConstructor
+filename: /glade/u/home/rlong/.local/lib/python3.7/site-packages/yaml/constructor.py, modulename: constructor, funcname: add_constructor
+filename: /glade/u/home/rlong/.local/lib/python3.7/site-packages/yaml/constructor.py, modulename: constructor, funcname: add_multi_constructor
+filename: /glade/u/home/rlong/.local/lib/python3.7/site-packages/yaml/constructor.py, modulename: constructor, funcname: construct_yaml_bool
+filename: /glade/u/home/rlong/.local/lib/python3.7/site-packages/yaml/constructor.py, modulename: constructor, funcname: construct_yaml_int
+filename: /glade/u/home/rlong/.local/lib/python3.7/site-packages/yaml/constructor.py, modulename: constructor, funcname: construct_yaml_map
+filename: /glade/u/home/rlong/.local/lib/python3.7/site-packages/yaml/constructor.py, modulename: constructor, funcname: construct_yaml_seq
+filename: /glade/u/home/rlong/.local/lib/python3.7/site-packages/yaml/constructor.py, modulename: constructor, funcname: construct_yaml_str
+filename: /glade/u/home/rlong/.local/lib/python3.7/site-packages/yaml/cyaml.py, modulename: cyaml, funcname: <module>
+filename: /glade/u/home/rlong/.local/lib/python3.7/site-packages/yaml/cyaml.py, modulename: cyaml, funcname: CBaseDumper
+filename: /glade/u/home/rlong/.local/lib/python3.7/site-packages/yaml/cyaml.py, modulename: cyaml, funcname: CBaseLoader
+filename: /glade/u/home/rlong/.local/lib/python3.7/site-packages/yaml/cyaml.py, modulename: cyaml, funcname: CDumper
+filename: /glade/u/home/rlong/.local/lib/python3.7/site-packages/yaml/cyaml.py, modulename: cyaml, funcname: CFullLoader
+filename: /glade/u/home/rlong/.local/lib/python3.7/site-packages/yaml/cyaml.py, modulename: cyaml, funcname: CLoader
+filename: /glade/u/home/rlong/.local/lib/python3.7/site-packages/yaml/cyaml.py, modulename: cyaml, funcname: CSafeDumper
+filename: /glade/u/home/rlong/.local/lib/python3.7/site-packages/yaml/cyaml.py, modulename: cyaml, funcname: CSafeLoader
+filename: /glade/u/home/rlong/.local/lib/python3.7/site-packages/yaml/cyaml.py, modulename: cyaml, funcname: CUnsafeLoader
+filename: /glade/u/home/rlong/.local/lib/python3.7/site-packages/yaml/dumper.py, modulename: dumper, funcname: <module>
+filename: /glade/u/home/rlong/.local/lib/python3.7/site-packages/yaml/dumper.py, modulename: dumper, funcname: BaseDumper
+filename: /glade/u/home/rlong/.local/lib/python3.7/site-packages/yaml/dumper.py, modulename: dumper, funcname: Dumper
+filename: /glade/u/home/rlong/.local/lib/python3.7/site-packages/yaml/dumper.py, modulename: dumper, funcname: SafeDumper
+filename: /glade/u/home/rlong/.local/lib/python3.7/site-packages/yaml/emitter.py, modulename: emitter, funcname: <module>
+filename: /glade/u/home/rlong/.local/lib/python3.7/site-packages/yaml/emitter.py, modulename: emitter, funcname: Emitter
+filename: /glade/u/home/rlong/.local/lib/python3.7/site-packages/yaml/emitter.py, modulename: emitter, funcname: EmitterError
+filename: /glade/u/home/rlong/.local/lib/python3.7/site-packages/yaml/emitter.py, modulename: emitter, funcname: ScalarAnalysis
+filename: /glade/u/home/rlong/.local/lib/python3.7/site-packages/yaml/error.py, modulename: error, funcname: <module>
+filename: /glade/u/home/rlong/.local/lib/python3.7/site-packages/yaml/error.py, modulename: error, funcname: Mark
+filename: /glade/u/home/rlong/.local/lib/python3.7/site-packages/yaml/error.py, modulename: error, funcname: Mark.__init__
+filename: /glade/u/home/rlong/.local/lib/python3.7/site-packages/yaml/error.py, modulename: error, funcname: MarkedYAMLError
+filename: /glade/u/home/rlong/.local/lib/python3.7/site-packages/yaml/error.py, modulename: error, funcname: YAMLError
+filename: /glade/u/home/rlong/.local/lib/python3.7/site-packages/yaml/events.py, modulename: events, funcname: <module>
+filename: /glade/u/home/rlong/.local/lib/python3.7/site-packages/yaml/events.py, modulename: events, funcname: AliasEvent
+filename: /glade/u/home/rlong/.local/lib/python3.7/site-packages/yaml/events.py, modulename: events, funcname: CollectionEndEvent
+filename: /glade/u/home/rlong/.local/lib/python3.7/site-packages/yaml/events.py, modulename: events, funcname: CollectionStartEvent
+filename: /glade/u/home/rlong/.local/lib/python3.7/site-packages/yaml/events.py, modulename: events, funcname: CollectionStartEvent.__init__
+filename: /glade/u/home/rlong/.local/lib/python3.7/site-packages/yaml/events.py, modulename: events, funcname: DocumentEndEvent
+filename: /glade/u/home/rlong/.local/lib/python3.7/site-packages/yaml/events.py, modulename: events, funcname: DocumentEndEvent.__init__
+filename: /glade/u/home/rlong/.local/lib/python3.7/site-packages/yaml/events.py, modulename: events, funcname: DocumentStartEvent
+filename: /glade/u/home/rlong/.local/lib/python3.7/site-packages/yaml/events.py, modulename: events, funcname: DocumentStartEvent.__init__
+filename: /glade/u/home/rlong/.local/lib/python3.7/site-packages/yaml/events.py, modulename: events, funcname: Event
+filename: /glade/u/home/rlong/.local/lib/python3.7/site-packages/yaml/events.py, modulename: events, funcname: Event.__init__
+filename: /glade/u/home/rlong/.local/lib/python3.7/site-packages/yaml/events.py, modulename: events, funcname: MappingEndEvent
+filename: /glade/u/home/rlong/.local/lib/python3.7/site-packages/yaml/events.py, modulename: events, funcname: MappingStartEvent
+filename: /glade/u/home/rlong/.local/lib/python3.7/site-packages/yaml/events.py, modulename: events, funcname: NodeEvent
+filename: /glade/u/home/rlong/.local/lib/python3.7/site-packages/yaml/events.py, modulename: events, funcname: ScalarEvent
+filename: /glade/u/home/rlong/.local/lib/python3.7/site-packages/yaml/events.py, modulename: events, funcname: ScalarEvent.__init__
+filename: /glade/u/home/rlong/.local/lib/python3.7/site-packages/yaml/events.py, modulename: events, funcname: SequenceEndEvent
+filename: /glade/u/home/rlong/.local/lib/python3.7/site-packages/yaml/events.py, modulename: events, funcname: SequenceStartEvent
+filename: /glade/u/home/rlong/.local/lib/python3.7/site-packages/yaml/events.py, modulename: events, funcname: StreamEndEvent
+filename: /glade/u/home/rlong/.local/lib/python3.7/site-packages/yaml/events.py, modulename: events, funcname: StreamStartEvent
+filename: /glade/u/home/rlong/.local/lib/python3.7/site-packages/yaml/events.py, modulename: events, funcname: StreamStartEvent.__init__
+filename: /glade/u/home/rlong/.local/lib/python3.7/site-packages/yaml/loader.py, modulename: loader, funcname: <module>
+filename: /glade/u/home/rlong/.local/lib/python3.7/site-packages/yaml/loader.py, modulename: loader, funcname: BaseLoader
+filename: /glade/u/home/rlong/.local/lib/python3.7/site-packages/yaml/loader.py, modulename: loader, funcname: FullLoader
+filename: /glade/u/home/rlong/.local/lib/python3.7/site-packages/yaml/loader.py, modulename: loader, funcname: Loader
+filename: /glade/u/home/rlong/.local/lib/python3.7/site-packages/yaml/loader.py, modulename: loader, funcname: SafeLoader
+filename: /glade/u/home/rlong/.local/lib/python3.7/site-packages/yaml/loader.py, modulename: loader, funcname: SafeLoader.__init__
+filename: /glade/u/home/rlong/.local/lib/python3.7/site-packages/yaml/loader.py, modulename: loader, funcname: UnsafeLoader
+filename: /glade/u/home/rlong/.local/lib/python3.7/site-packages/yaml/nodes.py, modulename: nodes, funcname: <module>
+filename: /glade/u/home/rlong/.local/lib/python3.7/site-packages/yaml/nodes.py, modulename: nodes, funcname: CollectionNode
+filename: /glade/u/home/rlong/.local/lib/python3.7/site-packages/yaml/nodes.py, modulename: nodes, funcname: CollectionNode.__init__
+filename: /glade/u/home/rlong/.local/lib/python3.7/site-packages/yaml/nodes.py, modulename: nodes, funcname: MappingNode
+filename: /glade/u/home/rlong/.local/lib/python3.7/site-packages/yaml/nodes.py, modulename: nodes, funcname: Node
+filename: /glade/u/home/rlong/.local/lib/python3.7/site-packages/yaml/nodes.py, modulename: nodes, funcname: ScalarNode
+filename: /glade/u/home/rlong/.local/lib/python3.7/site-packages/yaml/nodes.py, modulename: nodes, funcname: ScalarNode.__init__
+filename: /glade/u/home/rlong/.local/lib/python3.7/site-packages/yaml/nodes.py, modulename: nodes, funcname: SequenceNode
+filename: /glade/u/home/rlong/.local/lib/python3.7/site-packages/yaml/parser.py, modulename: parser, funcname: <module>
+filename: /glade/u/home/rlong/.local/lib/python3.7/site-packages/yaml/parser.py, modulename: parser, funcname: Parser
+filename: /glade/u/home/rlong/.local/lib/python3.7/site-packages/yaml/parser.py, modulename: parser, funcname: Parser.__init__
+filename: /glade/u/home/rlong/.local/lib/python3.7/site-packages/yaml/parser.py, modulename: parser, funcname: Parser.check_event
+filename: /glade/u/home/rlong/.local/lib/python3.7/site-packages/yaml/parser.py, modulename: parser, funcname: Parser.dispose
+filename: /glade/u/home/rlong/.local/lib/python3.7/site-packages/yaml/parser.py, modulename: parser, funcname: Parser.get_event
+filename: /glade/u/home/rlong/.local/lib/python3.7/site-packages/yaml/parser.py, modulename: parser, funcname: Parser.parse_block_mapping_first_key
+filename: /glade/u/home/rlong/.local/lib/python3.7/site-packages/yaml/parser.py, modulename: parser, funcname: Parser.parse_block_mapping_key
+filename: /glade/u/home/rlong/.local/lib/python3.7/site-packages/yaml/parser.py, modulename: parser, funcname: Parser.parse_block_mapping_value
+filename: /glade/u/home/rlong/.local/lib/python3.7/site-packages/yaml/parser.py, modulename: parser, funcname: Parser.parse_block_node
+filename: /glade/u/home/rlong/.local/lib/python3.7/site-packages/yaml/parser.py, modulename: parser, funcname: Parser.parse_block_node_or_indentless_sequence
+filename: /glade/u/home/rlong/.local/lib/python3.7/site-packages/yaml/parser.py, modulename: parser, funcname: Parser.parse_document_end
+filename: /glade/u/home/rlong/.local/lib/python3.7/site-packages/yaml/parser.py, modulename: parser, funcname: Parser.parse_document_start
+filename: /glade/u/home/rlong/.local/lib/python3.7/site-packages/yaml/parser.py, modulename: parser, funcname: Parser.parse_flow_node
+filename: /glade/u/home/rlong/.local/lib/python3.7/site-packages/yaml/parser.py, modulename: parser, funcname: Parser.parse_flow_sequence_entry
+filename: /glade/u/home/rlong/.local/lib/python3.7/site-packages/yaml/parser.py, modulename: parser, funcname: Parser.parse_flow_sequence_first_entry
+filename: /glade/u/home/rlong/.local/lib/python3.7/site-packages/yaml/parser.py, modulename: parser, funcname: Parser.parse_implicit_document_start
+filename: /glade/u/home/rlong/.local/lib/python3.7/site-packages/yaml/parser.py, modulename: parser, funcname: Parser.parse_node
+filename: /glade/u/home/rlong/.local/lib/python3.7/site-packages/yaml/parser.py, modulename: parser, funcname: Parser.parse_stream_start
+filename: /glade/u/home/rlong/.local/lib/python3.7/site-packages/yaml/parser.py, modulename: parser, funcname: Parser.peek_event
+filename: /glade/u/home/rlong/.local/lib/python3.7/site-packages/yaml/parser.py, modulename: parser, funcname: ParserError
+filename: /glade/u/home/rlong/.local/lib/python3.7/site-packages/yaml/reader.py, modulename: reader, funcname: <module>
+filename: /glade/u/home/rlong/.local/lib/python3.7/site-packages/yaml/reader.py, modulename: reader, funcname: Reader
+filename: /glade/u/home/rlong/.local/lib/python3.7/site-packages/yaml/reader.py, modulename: reader, funcname: Reader.__init__
+filename: /glade/u/home/rlong/.local/lib/python3.7/site-packages/yaml/reader.py, modulename: reader, funcname: Reader.check_printable
+filename: /glade/u/home/rlong/.local/lib/python3.7/site-packages/yaml/reader.py, modulename: reader, funcname: Reader.determine_encoding
+filename: /glade/u/home/rlong/.local/lib/python3.7/site-packages/yaml/reader.py, modulename: reader, funcname: Reader.forward
+filename: /glade/u/home/rlong/.local/lib/python3.7/site-packages/yaml/reader.py, modulename: reader, funcname: Reader.get_mark
+filename: /glade/u/home/rlong/.local/lib/python3.7/site-packages/yaml/reader.py, modulename: reader, funcname: Reader.peek
+filename: /glade/u/home/rlong/.local/lib/python3.7/site-packages/yaml/reader.py, modulename: reader, funcname: Reader.prefix
+filename: /glade/u/home/rlong/.local/lib/python3.7/site-packages/yaml/reader.py, modulename: reader, funcname: Reader.update
+filename: /glade/u/home/rlong/.local/lib/python3.7/site-packages/yaml/reader.py, modulename: reader, funcname: Reader.update_raw
+filename: /glade/u/home/rlong/.local/lib/python3.7/site-packages/yaml/reader.py, modulename: reader, funcname: ReaderError
+filename: /glade/u/home/rlong/.local/lib/python3.7/site-packages/yaml/representer.py, modulename: representer, funcname: <module>
+filename: /glade/u/home/rlong/.local/lib/python3.7/site-packages/yaml/representer.py, modulename: representer, funcname: BaseRepresenter
+filename: /glade/u/home/rlong/.local/lib/python3.7/site-packages/yaml/representer.py, modulename: representer, funcname: Representer
+filename: /glade/u/home/rlong/.local/lib/python3.7/site-packages/yaml/representer.py, modulename: representer, funcname: RepresenterError
+filename: /glade/u/home/rlong/.local/lib/python3.7/site-packages/yaml/representer.py, modulename: representer, funcname: SafeRepresenter
+filename: /glade/u/home/rlong/.local/lib/python3.7/site-packages/yaml/representer.py, modulename: representer, funcname: add_multi_representer
+filename: /glade/u/home/rlong/.local/lib/python3.7/site-packages/yaml/representer.py, modulename: representer, funcname: add_representer
+filename: /glade/u/home/rlong/.local/lib/python3.7/site-packages/yaml/resolver.py, modulename: resolver, funcname: <module>
+filename: /glade/u/home/rlong/.local/lib/python3.7/site-packages/yaml/resolver.py, modulename: resolver, funcname: BaseResolver
+filename: /glade/u/home/rlong/.local/lib/python3.7/site-packages/yaml/resolver.py, modulename: resolver, funcname: BaseResolver.__init__
+filename: /glade/u/home/rlong/.local/lib/python3.7/site-packages/yaml/resolver.py, modulename: resolver, funcname: BaseResolver.ascend_resolver
+filename: /glade/u/home/rlong/.local/lib/python3.7/site-packages/yaml/resolver.py, modulename: resolver, funcname: BaseResolver.descend_resolver
+filename: /glade/u/home/rlong/.local/lib/python3.7/site-packages/yaml/resolver.py, modulename: resolver, funcname: BaseResolver.resolve
+filename: /glade/u/home/rlong/.local/lib/python3.7/site-packages/yaml/resolver.py, modulename: resolver, funcname: Resolver
+filename: /glade/u/home/rlong/.local/lib/python3.7/site-packages/yaml/resolver.py, modulename: resolver, funcname: ResolverError
+filename: /glade/u/home/rlong/.local/lib/python3.7/site-packages/yaml/resolver.py, modulename: resolver, funcname: add_implicit_resolver
+filename: /glade/u/home/rlong/.local/lib/python3.7/site-packages/yaml/scanner.py, modulename: scanner, funcname: <module>
+filename: /glade/u/home/rlong/.local/lib/python3.7/site-packages/yaml/scanner.py, modulename: scanner, funcname: Scanner
+filename: /glade/u/home/rlong/.local/lib/python3.7/site-packages/yaml/scanner.py, modulename: scanner, funcname: Scanner.__init__
+filename: /glade/u/home/rlong/.local/lib/python3.7/site-packages/yaml/scanner.py, modulename: scanner, funcname: Scanner.add_indent
+filename: /glade/u/home/rlong/.local/lib/python3.7/site-packages/yaml/scanner.py, modulename: scanner, funcname: Scanner.check_plain
+filename: /glade/u/home/rlong/.local/lib/python3.7/site-packages/yaml/scanner.py, modulename: scanner, funcname: Scanner.check_token
+filename: /glade/u/home/rlong/.local/lib/python3.7/site-packages/yaml/scanner.py, modulename: scanner, funcname: Scanner.check_value
+filename: /glade/u/home/rlong/.local/lib/python3.7/site-packages/yaml/scanner.py, modulename: scanner, funcname: Scanner.fetch_double
+filename: /glade/u/home/rlong/.local/lib/python3.7/site-packages/yaml/scanner.py, modulename: scanner, funcname: Scanner.fetch_flow_collection_end
+filename: /glade/u/home/rlong/.local/lib/python3.7/site-packages/yaml/scanner.py, modulename: scanner, funcname: Scanner.fetch_flow_collection_start
+filename: /glade/u/home/rlong/.local/lib/python3.7/site-packages/yaml/scanner.py, modulename: scanner, funcname: Scanner.fetch_flow_scalar
+filename: /glade/u/home/rlong/.local/lib/python3.7/site-packages/yaml/scanner.py, modulename: scanner, funcname: Scanner.fetch_flow_sequence_end
+filename: /glade/u/home/rlong/.local/lib/python3.7/site-packages/yaml/scanner.py, modulename: scanner, funcname: Scanner.fetch_flow_sequence_start
+filename: /glade/u/home/rlong/.local/lib/python3.7/site-packages/yaml/scanner.py, modulename: scanner, funcname: Scanner.fetch_more_tokens
+filename: /glade/u/home/rlong/.local/lib/python3.7/site-packages/yaml/scanner.py, modulename: scanner, funcname: Scanner.fetch_plain
+filename: /glade/u/home/rlong/.local/lib/python3.7/site-packages/yaml/scanner.py, modulename: scanner, funcname: Scanner.fetch_stream_end
+filename: /glade/u/home/rlong/.local/lib/python3.7/site-packages/yaml/scanner.py, modulename: scanner, funcname: Scanner.fetch_stream_start
+filename: /glade/u/home/rlong/.local/lib/python3.7/site-packages/yaml/scanner.py, modulename: scanner, funcname: Scanner.fetch_value
+filename: /glade/u/home/rlong/.local/lib/python3.7/site-packages/yaml/scanner.py, modulename: scanner, funcname: Scanner.get_token
+filename: /glade/u/home/rlong/.local/lib/python3.7/site-packages/yaml/scanner.py, modulename: scanner, funcname: Scanner.need_more_tokens
+filename: /glade/u/home/rlong/.local/lib/python3.7/site-packages/yaml/scanner.py, modulename: scanner, funcname: Scanner.next_possible_simple_key
+filename: /glade/u/home/rlong/.local/lib/python3.7/site-packages/yaml/scanner.py, modulename: scanner, funcname: Scanner.peek_token
+filename: /glade/u/home/rlong/.local/lib/python3.7/site-packages/yaml/scanner.py, modulename: scanner, funcname: Scanner.remove_possible_simple_key
+filename: /glade/u/home/rlong/.local/lib/python3.7/site-packages/yaml/scanner.py, modulename: scanner, funcname: Scanner.save_possible_simple_key
+filename: /glade/u/home/rlong/.local/lib/python3.7/site-packages/yaml/scanner.py, modulename: scanner, funcname: Scanner.scan_flow_scalar
+filename: /glade/u/home/rlong/.local/lib/python3.7/site-packages/yaml/scanner.py, modulename: scanner, funcname: Scanner.scan_flow_scalar_non_spaces
+filename: /glade/u/home/rlong/.local/lib/python3.7/site-packages/yaml/scanner.py, modulename: scanner, funcname: Scanner.scan_line_break
+filename: /glade/u/home/rlong/.local/lib/python3.7/site-packages/yaml/scanner.py, modulename: scanner, funcname: Scanner.scan_plain
+filename: /glade/u/home/rlong/.local/lib/python3.7/site-packages/yaml/scanner.py, modulename: scanner, funcname: Scanner.scan_plain_spaces
+filename: /glade/u/home/rlong/.local/lib/python3.7/site-packages/yaml/scanner.py, modulename: scanner, funcname: Scanner.scan_to_next_token
+filename: /glade/u/home/rlong/.local/lib/python3.7/site-packages/yaml/scanner.py, modulename: scanner, funcname: Scanner.stale_possible_simple_keys
+filename: /glade/u/home/rlong/.local/lib/python3.7/site-packages/yaml/scanner.py, modulename: scanner, funcname: Scanner.unwind_indent
+filename: /glade/u/home/rlong/.local/lib/python3.7/site-packages/yaml/scanner.py, modulename: scanner, funcname: ScannerError
+filename: /glade/u/home/rlong/.local/lib/python3.7/site-packages/yaml/scanner.py, modulename: scanner, funcname: SimpleKey
+filename: /glade/u/home/rlong/.local/lib/python3.7/site-packages/yaml/scanner.py, modulename: scanner, funcname: SimpleKey.__init__
+filename: /glade/u/home/rlong/.local/lib/python3.7/site-packages/yaml/serializer.py, modulename: serializer, funcname: <module>
+filename: /glade/u/home/rlong/.local/lib/python3.7/site-packages/yaml/serializer.py, modulename: serializer, funcname: Serializer
+filename: /glade/u/home/rlong/.local/lib/python3.7/site-packages/yaml/serializer.py, modulename: serializer, funcname: SerializerError
+filename: /glade/u/home/rlong/.local/lib/python3.7/site-packages/yaml/tokens.py, modulename: tokens, funcname: <module>
+filename: /glade/u/home/rlong/.local/lib/python3.7/site-packages/yaml/tokens.py, modulename: tokens, funcname: AliasToken
+filename: /glade/u/home/rlong/.local/lib/python3.7/site-packages/yaml/tokens.py, modulename: tokens, funcname: AnchorToken
+filename: /glade/u/home/rlong/.local/lib/python3.7/site-packages/yaml/tokens.py, modulename: tokens, funcname: BlockEndToken
+filename: /glade/u/home/rlong/.local/lib/python3.7/site-packages/yaml/tokens.py, modulename: tokens, funcname: BlockEntryToken
+filename: /glade/u/home/rlong/.local/lib/python3.7/site-packages/yaml/tokens.py, modulename: tokens, funcname: BlockMappingStartToken
+filename: /glade/u/home/rlong/.local/lib/python3.7/site-packages/yaml/tokens.py, modulename: tokens, funcname: BlockSequenceStartToken
+filename: /glade/u/home/rlong/.local/lib/python3.7/site-packages/yaml/tokens.py, modulename: tokens, funcname: DirectiveToken
+filename: /glade/u/home/rlong/.local/lib/python3.7/site-packages/yaml/tokens.py, modulename: tokens, funcname: DocumentEndToken
+filename: /glade/u/home/rlong/.local/lib/python3.7/site-packages/yaml/tokens.py, modulename: tokens, funcname: DocumentStartToken
+filename: /glade/u/home/rlong/.local/lib/python3.7/site-packages/yaml/tokens.py, modulename: tokens, funcname: FlowEntryToken
+filename: /glade/u/home/rlong/.local/lib/python3.7/site-packages/yaml/tokens.py, modulename: tokens, funcname: FlowMappingEndToken
+filename: /glade/u/home/rlong/.local/lib/python3.7/site-packages/yaml/tokens.py, modulename: tokens, funcname: FlowMappingStartToken
+filename: /glade/u/home/rlong/.local/lib/python3.7/site-packages/yaml/tokens.py, modulename: tokens, funcname: FlowSequenceEndToken
+filename: /glade/u/home/rlong/.local/lib/python3.7/site-packages/yaml/tokens.py, modulename: tokens, funcname: FlowSequenceStartToken
+filename: /glade/u/home/rlong/.local/lib/python3.7/site-packages/yaml/tokens.py, modulename: tokens, funcname: KeyToken
+filename: /glade/u/home/rlong/.local/lib/python3.7/site-packages/yaml/tokens.py, modulename: tokens, funcname: ScalarToken
+filename: /glade/u/home/rlong/.local/lib/python3.7/site-packages/yaml/tokens.py, modulename: tokens, funcname: ScalarToken.__init__
+filename: /glade/u/home/rlong/.local/lib/python3.7/site-packages/yaml/tokens.py, modulename: tokens, funcname: StreamEndToken
+filename: /glade/u/home/rlong/.local/lib/python3.7/site-packages/yaml/tokens.py, modulename: tokens, funcname: StreamStartToken
+filename: /glade/u/home/rlong/.local/lib/python3.7/site-packages/yaml/tokens.py, modulename: tokens, funcname: StreamStartToken.__init__
+filename: /glade/u/home/rlong/.local/lib/python3.7/site-packages/yaml/tokens.py, modulename: tokens, funcname: TagToken
+filename: /glade/u/home/rlong/.local/lib/python3.7/site-packages/yaml/tokens.py, modulename: tokens, funcname: Token
+filename: /glade/u/home/rlong/.local/lib/python3.7/site-packages/yaml/tokens.py, modulename: tokens, funcname: Token.__init__
+filename: /glade/u/home/rlong/.local/lib/python3.7/site-packages/yaml/tokens.py, modulename: tokens, funcname: ValueToken
+filename: <frozen importlib._bootstrap>, modulename: <frozen importlib, funcname: <genexpr>
+filename: <frozen importlib._bootstrap>, modulename: <frozen importlib, funcname: ModuleSpec.__init__
+filename: <frozen importlib._bootstrap>, modulename: <frozen importlib, funcname: _ImportLockContext.__enter__
+filename: <frozen importlib._bootstrap>, modulename: <frozen importlib, funcname: _ImportLockContext.__exit__
+filename: <frozen importlib._bootstrap>, modulename: <frozen importlib, funcname: _ModuleLock.__init__
+filename: <frozen importlib._bootstrap>, modulename: <frozen importlib, funcname: _ModuleLock.acquire
+filename: <frozen importlib._bootstrap>, modulename: <frozen importlib, funcname: _ModuleLock.release
+filename: <frozen importlib._bootstrap>, modulename: <frozen importlib, funcname: _ModuleLockManager.__enter__
+filename: <frozen importlib._bootstrap>, modulename: <frozen importlib, funcname: _ModuleLockManager.__exit__
+filename: <frozen importlib._bootstrap>, modulename: <frozen importlib, funcname: _ModuleLockManager.__init__
+filename: <frozen importlib._bootstrap>, modulename: <frozen importlib, funcname: _call_with_frames_removed
+filename: <frozen importlib._bootstrap>, modulename: <frozen importlib, funcname: _find_and_load
+filename: <frozen importlib._bootstrap>, modulename: <frozen importlib, funcname: _find_and_load_unlocked
+filename: <frozen importlib._bootstrap>, modulename: <frozen importlib, funcname: _find_spec
+filename: <frozen importlib._bootstrap>, modulename: <frozen importlib, funcname: _get_module_lock
+filename: <frozen importlib._bootstrap>, modulename: <frozen importlib, funcname: _handle_fromlist
+filename: <frozen importlib._bootstrap>, modulename: <frozen importlib, funcname: _init_module_attrs
+filename: <frozen importlib._bootstrap>, modulename: <frozen importlib, funcname: _installed_safely.__enter__
+filename: <frozen importlib._bootstrap>, modulename: <frozen importlib, funcname: _installed_safely.__exit__
+filename: <frozen importlib._bootstrap>, modulename: <frozen importlib, funcname: _installed_safely.__init__
+filename: <frozen importlib._bootstrap>, modulename: <frozen importlib, funcname: _load_unlocked
+filename: <frozen importlib._bootstrap>, modulename: <frozen importlib, funcname: _lock_unlock_module
+filename: <frozen importlib._bootstrap>, modulename: <frozen importlib, funcname: _new_module
+filename: <frozen importlib._bootstrap>, modulename: <frozen importlib, funcname: _verbose_message
+filename: <frozen importlib._bootstrap>, modulename: <frozen importlib, funcname: cached
+filename: <frozen importlib._bootstrap>, modulename: <frozen importlib, funcname: cb
+filename: <frozen importlib._bootstrap>, modulename: <frozen importlib, funcname: find_spec
+filename: <frozen importlib._bootstrap>, modulename: <frozen importlib, funcname: has_location
+filename: <frozen importlib._bootstrap>, modulename: <frozen importlib, funcname: module_from_spec
+filename: <frozen importlib._bootstrap>, modulename: <frozen importlib, funcname: parent
+filename: <frozen importlib._bootstrap_external>, modulename: <frozen importlib, funcname: <genexpr>
+filename: <frozen importlib._bootstrap_external>, modulename: <frozen importlib, funcname: <listcomp>
+filename: <frozen importlib._bootstrap_external>, modulename: <frozen importlib, funcname: ExtensionFileLoader.__init__
+filename: <frozen importlib._bootstrap_external>, modulename: <frozen importlib, funcname: ExtensionFileLoader.create_module
+filename: <frozen importlib._bootstrap_external>, modulename: <frozen importlib, funcname: ExtensionFileLoader.exec_module
+filename: <frozen importlib._bootstrap_external>, modulename: <frozen importlib, funcname: FileFinder.__init__
+filename: <frozen importlib._bootstrap_external>, modulename: <frozen importlib, funcname: FileFinder._fill_cache
+filename: <frozen importlib._bootstrap_external>, modulename: <frozen importlib, funcname: FileFinder._get_spec
+filename: <frozen importlib._bootstrap_external>, modulename: <frozen importlib, funcname: FileFinder.find_spec
+filename: <frozen importlib._bootstrap_external>, modulename: <frozen importlib, funcname: FileLoader.__init__
+filename: <frozen importlib._bootstrap_external>, modulename: <frozen importlib, funcname: FileLoader.get_data
+filename: <frozen importlib._bootstrap_external>, modulename: <frozen importlib, funcname: SourceFileLoader.path_stats
+filename: <frozen importlib._bootstrap_external>, modulename: <frozen importlib, funcname: SourceLoader.get_code
+filename: <frozen importlib._bootstrap_external>, modulename: <frozen importlib, funcname: _LoaderBasics.create_module
+filename: <frozen importlib._bootstrap_external>, modulename: <frozen importlib, funcname: _check_name_wrapper
+filename: <frozen importlib._bootstrap_external>, modulename: <frozen importlib, funcname: _classify_pyc
+filename: <frozen importlib._bootstrap_external>, modulename: <frozen importlib, funcname: _compile_bytecode
+filename: <frozen importlib._bootstrap_external>, modulename: <frozen importlib, funcname: _get_cached
+filename: <frozen importlib._bootstrap_external>, modulename: <frozen importlib, funcname: _get_spec
+filename: <frozen importlib._bootstrap_external>, modulename: <frozen importlib, funcname: _path_hooks
+filename: <frozen importlib._bootstrap_external>, modulename: <frozen importlib, funcname: _path_importer_cache
+filename: <frozen importlib._bootstrap_external>, modulename: <frozen importlib, funcname: _path_is_mode_type
+filename: <frozen importlib._bootstrap_external>, modulename: <frozen importlib, funcname: _path_isdir
+filename: <frozen importlib._bootstrap_external>, modulename: <frozen importlib, funcname: _path_isfile
+filename: <frozen importlib._bootstrap_external>, modulename: <frozen importlib, funcname: _path_join
+filename: <frozen importlib._bootstrap_external>, modulename: <frozen importlib, funcname: _path_split
+filename: <frozen importlib._bootstrap_external>, modulename: <frozen importlib, funcname: _path_stat
+filename: <frozen importlib._bootstrap_external>, modulename: <frozen importlib, funcname: _r_long
+filename: <frozen importlib._bootstrap_external>, modulename: <frozen importlib, funcname: _relax_case
+filename: <frozen importlib._bootstrap_external>, modulename: <frozen importlib, funcname: _validate_timestamp_pyc
+filename: <frozen importlib._bootstrap_external>, modulename: <frozen importlib, funcname: cache_from_source
+filename: <frozen importlib._bootstrap_external>, modulename: <frozen importlib, funcname: exec_module
+filename: <frozen importlib._bootstrap_external>, modulename: <frozen importlib, funcname: find_spec
+filename: <frozen importlib._bootstrap_external>, modulename: <frozen importlib, funcname: get_filename
+filename: <frozen importlib._bootstrap_external>, modulename: <frozen importlib, funcname: path_hook_for_FileFinder
+filename: <frozen importlib._bootstrap_external>, modulename: <frozen importlib, funcname: spec_from_file_location
+filename: <string>, modulename: <string>, funcname: <module>
