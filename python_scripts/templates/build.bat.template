@@ -1,0 +1,13 @@
+#!/bin/sh -l
+#SBATCH --account=${account}
+#SBATCH -o ${filename}_%j.o
+#SBATCH -e ${filename}_%j.e
+#SBATCH --time=${time}
+$partition
+$cluster
+$constraint
+#SBATCH --qos=${queue}
+#SBATCH --nodes=1
+#SBATCH --ntasks-per-node=${cpn}
+#SBATCH --exclusive
+export JOBID=$$SLURM_JOBID
