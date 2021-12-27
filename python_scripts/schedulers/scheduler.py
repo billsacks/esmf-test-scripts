@@ -53,12 +53,10 @@ class Scheduler(ABC):
     def template_data(self):
         raise NotImplementedError()
 
-    @abstractmethod
     def createHeaders(self, test: TestData):
         for _file_handler in [test.fb, test.ft]:
             _create_headers(self.template_data, _file_handler, self.TEMPLATE_PATH)
 
-    @abstractmethod
     def submitJob(self, test, subdir, mpiver, branch):
         _data = MonitorData(
             path_=test.mypath,
@@ -81,12 +79,10 @@ class Scheduler(ABC):
         result_job_number = batch_test(_data.job_number, _data.test_filename)
         monitor_cmd_test = monitor_test(_data._replace(job_number=result_job_number))
 
-        self.create_get_res_scripts(
-            monitor_cmd_build, monitor_cmd_test, "insert_default_bash"
-        )
+        self.create_get_res_scripts(monitor_cmd_build, monitor_cmd_test, "insert_default_bash")
 
     @abstractmethod
-    def checkQueue(self):
+    def checkqueue(self, job_id):
         raise NotImplementedError()
 
     @classmethod
