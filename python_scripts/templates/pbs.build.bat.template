@@ -1,0 +1,10 @@
+Tue Oct 26 20:36:03 UTC 2021
+#!/bin/sh -l
+#PBS -N ${b_filename}
+${file_name_and_time}
+#PBS -q ${queue}
+#PBS -A ${account}
+#PBS -l select=1:ncpus=${cpn}:mpiprocs=${cpn}
+JOBID="`echo $PBS_JOBID | cut -d. -f1`"
+
+cd ${cwd}
