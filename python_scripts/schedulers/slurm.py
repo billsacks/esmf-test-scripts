@@ -39,32 +39,33 @@ MonitorData = namedtuple(
 
 TEMPLATE_PATH = "../templates/build.bat.template"
 
+SCHEDULER_TYPE = "slurm"
+
 
 class Slurm:
     def __init__(self):
-        self.type = "slurm"
+        self.type = SCHEDULER_TYPE
         self.data = defaultdict(str)
 
     @property
     def template_data(self):
-        if not self.data:
-            return {}
+        # May not need empty strings for defaults with defaultdict
         return {
             "filename": self.data.get("filename", ""),
-            "partition": format_partition(self.data.get("partition", "")),
+            "partition": _format_partition(self.data.get("partition", "")),
             "account": self.data.get("account", ""),
             "time": self.data.get("time", ""),
-            "cluster": format_cluster(self.data.get("cluster", "")),
-            "constraint": format_constraint(self.data.get("constraint", "")),
+            "cluster": _format_cluster(self.data.get("cluster", "")),
+            "constraint": _format_constraint(self.data.get("constraint", "")),
             "queue": self.data.get("queue", ""),
             "cpn": self.data.get("cpn", ""),
         }
 
-    def createHeaders(self, test: TestData):  # pylint disable=invalid_name
+    def createHeaders(self, test: TestData):  # pylint: disable=invalid-name
         for _file_handler in [test.fb, test.ft]:
             _create_headers(self.template_data, _file_handler)
 
-    def submitJob(self, test, subdir, mpiver, branch):
+    def submitJob(self, test, subdir, mpiver, branch):  # pylint: disable=invalid-name
         _data = MonitorData(
             path_=test.mypath,
             build_filename=test.b_filename,
@@ -81,7 +82,7 @@ class Slurm:
         )
         _submit_job(_data)
 
-    def parse_test_data(self, test):
+    def _parse_test_data(self, test):
         return TestData(
             mypath=test.mypath,
             b_filename=test.b_filename,
@@ -97,7 +98,7 @@ class Slurm:
         return _check_queue(jobid)
 
 
-class slurm(Slurm):
+class slurm(Slurm):  # pylint: disable=invalid-name
     """slurm is a wrapper around Slurm to maintain backwards compatibility"""
 
 
@@ -114,8 +115,7 @@ def _submit_job(_data: MonitorData):
     result_job_number = batch_test(_data.job_number, _data.test_filename)
     monitor_cmd_test = monitor_test(_data._replace(job_number=result_job_number))
 
-    # External Call
-    createGetResScripts(monitor_cmd_build, monitor_cmd_test, "insert_default_bash")
+    create_get_res_scripts(monitor_cmd_build, monitor_cmd_test, "insert_default_bash")
 
 
 def _check_queue(jobid):
@@ -133,36 +133,36 @@ def _check_queue(jobid):
         return True
 
 
-def createGetResScripts(monitor_cmd_build, monitor_cmd_test, bash):
-    # write these out no matter what, so we can run them manually, if necessary
-    with open("getres-build.sh", "w") as get_res_file:
-        get_res_file.write("#!{} -l\n".format(bash))
-        get_res_file.write(f"{monitor_cmd_build} >& build-res.log &\n")
-        os.system("chmod +x getres-build.sh")
-
-    with open("getres-test.sh", "w") as get_res_file:
-        get_res_file.write("#!{} -l\n".format(bash))
-        get_res_file.write("{} >& test-res.log &\n".format(monitor_cmd_test))
-        os.system("chmod +x getres-test.sh")
-
-
-def format_constraint(value):
+def _format_constraint(value):
     if not value:
         return ""
     return f"SBATCH -C {value}"
 
 
-def format_partition(value):
+def _format_partition(value):
     if not value:
         return ""
     return f"#SBATCH --partition={value}"
 
 
-def format_cluster(value):
+def _format_cluster(value):
     # SBATCH --cluster={}\n
     if not value:
         return ""
     return f"#SBATCH --cluster={value}"
+
+
+def create_get_res_scripts(monitor_cmd_build, monitor_cmd_test, bash):
+    # write these out no matter what, so we can run them manually, if necessary
+    with open("getres-build.sh", "w") as get_res_file:
+        get_res_file.write(f"#!{bash} -l\n")
+        get_res_file.write(f"{monitor_cmd_build} >& build-res.log &\n")
+        os.system("chmod +x getres-build.sh")
+
+    with open("getres-test.sh", "w") as get_res_file:
+        get_res_file.write(f"#!{bash} -l\n")
+        get_res_file.write(f"{monitor_cmd_test} >& test-res.log &\n")
+        os.system("chmod +x getres-test.sh")
 
 
 def fetch_job_number(filename):
@@ -173,11 +173,12 @@ def fetch_job_number(filename):
             .decode("utf-8")
             .split()[3]
         )
-    except subprocess.CalledProcessError:
-        raise ValueError("Unable to determine job number from file %s", filename)
+    except subprocess.CalledProcessError as error:
+        raise ValueError from error
 
 
 def monitor_build(_data: MonitorData):
+    # External Call
     monitor_cmd_build = f"python3 {_data.path_}/archive_results.py -j {_data.job_number} -b {_data.sub_directory} -m {_data.machine_name} -s {_data.scheduler_type} -t {_data.script_directory} -a {_data.artifacts_root} -M {_data.mpi_version} -B {_data.branch} -d {_data.dryrun}"
 
     if _data.dryrun is True:
