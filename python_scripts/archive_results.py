@@ -1,69 +1,81 @@
-import os
-import subprocess
 import argparse
-import sys
-import time
 import glob
-import re
+import os
 import pathlib
-from schedulers.scheduler import scheduler
-from schedulers.noscheduler import NoScheduler
-from schedulers.pbs import pbs
-from schedulers.slurm import slurm
+import re
+import subprocess
+import time
+from collections import namedtuple
 from datetime import datetime
+
+from schedulers.noscheduler import NoScheduler
+from schedulers.pbs import PBS
+from schedulers.scheduler import Scheduler
+from schedulers.slurm import Slurm
+
+ArchiveResultsData = namedtuple(
+    "ArchivedResultsData",
+    [
+        "jobid",
+        "build_basename",
+        "machine_name",
+        "scheduler",
+        "test_root_dir",
+        "artifacts_root",
+        "mpiversion",
+        "branch",
+        "dryrun",
+        "root_path",
+    ],
+)
 
 
 class ArchiveResults:
-    def __init__(
-        self,
-        jobid,
-        build_basename,
-        machine_name,
-        scheduler,
-        test_root_dir,
-        artifacts_root,
-        mpiversion,
-        branch,
-        dryrun,
-    ):
+    def __init__(self, _data: ArchiveResultsData):
 
-        self.root_path = pathlib.Path(__file__).parent.absolute()
-        self.jobid = jobid
-        self.build_basename = build_basename
-        self.machine_name = machine_name
-        if scheduler == "pbs":
-            self.scheduler = pbs("pbs")
-        elif scheduler == "slurm":
-            self.scheduler = slurm("slurm")
-        elif scheduler == "None":
-            self.scheduler = NoScheduler("slurm")
-        self.test_root_dir = test_root_dir
-        self.artifacts_root = artifacts_root
-        self.mpiversion = mpiversion
-        self.branch = branch
-        self.dryrun = dryrun
-        print("dryrun is {} -- {}".format(dryrun, self.dryrun))
+        self.data = _data
+        self._build_time = None
+        self._scheduler = None
+        self._build_dir = None
+        self._build_hash = None
+        self._outpath = None
+
+    @property
+    def scheduler(self):
+        if not self._scheduler:
+            self._scheduler = get_scheduler(self.data.scheduler)
+        return self._scheduler
+
+    @property
+    def build_dir(self):
+        if not self._build_dir:
+            self._build_dir = f"{self.data.test_root_dir}/{self.data.build_basename}"
+        return self._build_dir
+
+    def monitor(self):
+        print(f"dryrun is {self.data.dryrun}")
         start_time = time.time()
         seconds = 144000
-        self.build_dir = "{}/{}".format(test_root_dir, build_basename)
         while True:
             current_time = time.time()
             elapsed_time = current_time - start_time
-            job_done = self.scheduler.checkqueue(jobid)
+            job_done = self.scheduler.checkqueue(self.data.jobid)
             if job_done:
                 oe_filelist = glob.glob(
-                    "{}/{}/*_{}*.log".format(test_root_dir, build_basename, jobid)
-                )
-                oe_filelist.extend(
-                    glob.glob("{}/{}/*.bat".format(test_root_dir, build_basename))
+                    f"{self.data.test_root_dir}/{self.data.build_basename}/*_{self.data.jobid}*.log"
                 )
                 oe_filelist.extend(
                     glob.glob(
-                        "{}/{}/module-*.log".format(test_root_dir, build_basename)
+                        f"{self.data.test_root_dir}/{self.data.build_basename}/*.bat"
                     )
                 )
-                print("filelist is {}".format(oe_filelist))
-                print("oe list is {}\n".format(oe_filelist))
+                oe_filelist.extend(
+                    glob.glob(
+                        f"{self.data.test_root_dir}/{self.data.build_basename}/module-*.log".format()
+                    )
+                )
+                print(f"filelist is {oe_filelist}")
+                print(f"oe list is {oe_filelist}\n")
                 self.copy_artifacts(oe_filelist)
                 break
             time.sleep(30)
@@ -73,8 +85,8 @@ class ArchiveResults:
                 break
 
     def runcmd(self, cmd):
-        if self.dryrun == True:
-            print("would have executed {}".format(cmd))
+        if self.data.dryrun is True:
+            print(f"would have executed {cmd}")
         else:
             os.system(cmd)
 
@@ -90,62 +102,64 @@ class ArchiveResults:
     ):
         results = (
             subprocess.check_output(
-                "grep ESMF_OS: {}/*_{}.log".format(self.build_dir, self.jobid),
+                f"grep ESMF_OS: {self.build_dir}/*_{self.data.jobid}.log",
                 shell=True,
             )
             .strip()
             .decode("utf-8")
         )
         esmf_os = results.split()[1]
-        print("HEY!!! esmf_os is {}".format(esmf_os))
+        print(f"HEY!!! esmf_os is {esmf_os}")
+
+        self._build_time = datetime.now().strftime("%H:%M:%S")
         if len(esmfmkfile) > 0:
-            self.build_time = datetime.fromtimestamp(os.path.getmtime(esmfmkfile[0]))
-        else:
-            now = datetime.now()
-            self.build_time = now.strftime("%H:%M:%S")
-        summary_file = open("{}/summary.dat".format(self.outpath), "w")
+            self._build_time = datetime.fromtimestamp(os.path.getmtime(esmfmkfile[0]))
+
+        summary_file = open(f"{self._outpath}/summary.dat", "w")
         summary_file.write(
             "\n===================================================================\n"
         )
         summary_file.write(
-            "Build for = {}, mpi version {} on {} esmf_os: {}\n".format(
-                self.build_basename, self.mpiversion, self.machine_name, esmf_os
-            )
+            f"Build for = {self.data.build_basename}, mpi version {self.data.mpiversion} on {self.data.machine_name} esmf_os: {esmf_os}\n"
         )
-        summary_file.write("Build time = {}\n".format(self.build_time))
-        summary_file.write("git hash = {}\n\n".format(self.build_hash))
+        summary_file.write(f"Build time = {self._build_time}\n")
+        summary_file.write(f"git hash = {self.build_hash}\n\n")
         unit_results = re.sub(" FAIL", "\tFAIL", unit_results)
         system_results = re.sub(" FAIL", " \tFAIL", system_results)
         example_results = re.sub(" FAIL", " \tFAIL", example_results)
-        summary_file.write("unit test results   \t{}\n".format(unit_results))
-        summary_file.write("system test results \t{}\n".format(system_results))
-        summary_file.write("example test results \t{}\n".format(example_results))
+        summary_file.write(f"unit test results   \t{unit_results}\n")
+        summary_file.write(f"system test results \t{system_results}\n")
+        summary_file.write(f"example test results \t{example_results}\n")
         summary_file.write(
-            "nuopc test results \tPASS {} \tFAIL {}\n\n".format(nuopc_pass, nuopc_fail)
+            f"nuopc test results \tPASS {nuopc_pass} \tFAIL {nuopc_fail}\n\n"
         )
         summary_file.write(
             "\n===================================================================\n"
         )
-        summary_file.write("\n\n{}\n\n".format(make_info))
+        summary_file.write(f"\n\n{make_info}\n\n")
         summary_file.write(
             "\n===================================================================\n"
         )
         summary_file.close()
 
+    @property
+    def build_hash(self):
+        if not self._build_hash:
+            self._build_hash = (
+                subprocess.check_output("git describe --tags --abbrev=7", shell=True)
+                .strip()
+                .decode("utf-8")
+            )
+        return self._build_hash
+
     def copy_artifacts(self, oe_filelist):
 
         build_basename = os.path.basename(self.build_dir)
-        gitbranch = self.branch
-        dirbranch = re.sub("/", "_", self.branch)
+        dirbranch = re.sub("/", "_", self.data.branch)
         cwd = os.getcwd()
         os.chdir(self.build_dir)
-        self.build_hash = (
-            subprocess.check_output("git describe --tags --abbrev=7", shell=True)
-            .strip()
-            .decode("utf-8")
-        )
         os.chdir(cwd)
-        print("build_basename is {}".format(build_basename))
+        print(f"build_basename is {build_basename}")
         parts = build_basename.split("_")
         # [compiler, version, mpiflavor, build_type,dirbranch] = build_basename.split("_")
         compiler = parts[0]
@@ -153,71 +167,51 @@ class ArchiveResults:
         mpiflavor = parts[2]
         build_type = parts[3]
         # get the full path for placment of artifacts
-        if self.mpiversion != "None":
-            outpath = "{}/{}/{}/{}/{}/{}/{}/{}".format(
-                self.artifacts_root,
-                dirbranch,
-                self.machine_name,
-                compiler,
-                version,
-                build_type,
-                mpiflavor,
-                self.mpiversion,
-            )
-        else:
-            outpath = "{}/{}/{}/{}/{}/{}/{}".format(
-                self.artifacts_root,
-                dirbranch,
-                self.machine_name,
-                compiler,
-                version,
-                build_type,
-                mpiflavor,
-            )
-        self.outpath = outpath
+        outpath = f"{self.data.artifacts_root}/{dirbranch}/{self.data.machine_name}/{compiler}/{version}/{build_type}/{mpiflavor}"
+        if self.data.mpiversion != "None":
+            outpath = outpath + f"/{self.data.mpiversion}"
+        self._outpath = outpath
         # copy/rename the stdout/stderr files to artifacts out directory
         test_stage = False
-        print("outpath is {}".format(outpath))
+        print(f"outpath is {outpath}")
         for cfile in oe_filelist:
-            print("cfile is {}".format(cfile))
-            if int(self.jobid) < 0:
+            print(f"cfile is {cfile}")
+            if int(self.data.jobid) < 0:
                 test_stage = True
             if (
-                cfile.find("test_{}".format(self.jobid)) != -1
+                cfile.find(f"test_{self.data.jobid}") != -1
             ):  # this is just the build job, so no test artifacts yet
                 test_stage = True
         if not test_stage:
             # remove old files in out directory
             print("just the build stage, so remove old files")
-            cmd = "mkdir -p {}/out; rm {}/*/*; rm {}/*.log; rm {}/summary.dat".format(
-                outpath, outpath, outpath, outpath
-            )
-            print("cmd is {}\n".format(cmd))
+            cmd = f"mkdir -p {outpath}/out; rm {outpath}/*/*; rm {outpath}/*.log; rm {outpath}/summary.dat"
+            print(f"cmd is {cmd}\n")
             self.runcmd(cmd)
         # print("oe filelist is {}".format(oe_filelist))
         if oe_filelist == []:
             return
         for cfile in oe_filelist:
-            nfile = os.path.basename(re.sub("_{}".format(self.jobid), "", cfile))
-            cp_cmd = "echo `date` > {}/out/{}".format(outpath, nfile)
+            nfile = os.path.basename(re.sub(f"_{self.data.jobid}", "", cfile))
+            cp_cmd = f"echo `date` > {outpath}/out/{nfile}"
             self.runcmd(cp_cmd)
-            cp_cmd = "cat {} >> {}/out/{}".format(cfile, outpath, nfile)
+            cp_cmd = f"cat {cfile} >> {outpath}/out/{nfile}"
             self.runcmd(cp_cmd)
-        if not (test_stage):
-            command = "grep success {}/build_{}.log".format(self.build_dir, self.jobid)
+        if not test_stage:
+            command = f"grep success {self.build_dir}/build_{self.data.jobid}.log"
             unit_results = "-1 -1"
             system_results = "-1 -1"
             example_results = "-1 -1"
             nuopc_pass = "-1"
             nuopc_fail = "-1"
             try:
-                build_result = (
-                    subprocess.check_output("{}".format(command), shell=True)
+                (
+                    subprocess.check_output(f"{command}", shell=True)
                     .strip()
                     .decode("utf-8")
                 )
-            except:
-                build_result = ""
+            except subprocess.CalledProcessError:
+
                 example_results = "Build did not complete successfully"
                 unit_results = "Build did not complete successfully"
                 system_results = "Build did not complete successfully"
@@ -234,13 +228,9 @@ class ArchiveResults:
                     .strip()
                     .decode("utf-8")
                 )
-            except:
-                make_info = "error finding {}/module-build.log or {}/info.log".format(
-                    self.build_dir, self.build_dir
-                )
-            esmfmkfile = glob.glob(
-                "{}/lib/lib{}/*/esmf.mk".format(self.build_dir, build_type)
-            )
+            except subprocess.CalledProcessError:
+                make_info = f"error finding {self.build_dir}/module-build.log or {self.build_dir}/info.log"
+            esmfmkfile = glob.glob(f"{self.build_dir}/lib/lib{build_type}/*/esmf.mk")
             self.create_summary(
                 unit_results,
                 system_results,
@@ -250,92 +240,71 @@ class ArchiveResults:
                 make_info,
                 esmfmkfile,
             )
-            git_cmd = "cd {};git checkout {};git add {}/{};git commit -a -m'update for build of {} with hash {} on {} [ci skip]';git push origin {}".format(
-                self.artifacts_root,
-                self.machine_name,
-                dirbranch,
-                self.machine_name,
-                build_basename,
-                self.build_hash,
-                self.machine_name,
-                self.machine_name,
-            )
-            print("git_cmd is {}".format(git_cmd))
+            git_cmd = f"cd {self.data.artifacts_root};git checkout {self.data.machine_name};git add {dirbranch}/{self.data.machine_name};git commit -a -m'update for build of {build_basename} with hash {self.build_hash} on {self.data.machine_name} [ci skip]';git push origin {self.data.machine_name}"
+            print(f"git_cmd is {git_cmd}")
             self.runcmd(git_cmd)
             return
         # Make directories, if they aren't already there
-        cmd = "mkdir -p {}/examples; rm {}/examples/*; rm {}/*".format(
-            outpath, outpath, outpath
-        )
+        cmd = f"mkdir -p {outpath}/examples; rm {outpath}/examples/*; rm {outpath}/*"
         self.runcmd(cmd)
-        cmd = "mkdir -p {}/apps; rm {}/apps/*".format(outpath, outpath)
+        cmd = f"mkdir -p {outpath}/apps; rm {outpath}/apps/*"
         self.runcmd(cmd)
-        cmd = "mkdir -p {}/test; rm {}/test/*".format(outpath, outpath)
+        cmd = f"mkdir -p {outpath}/test; rm {outpath}/test/*"
         self.runcmd(cmd)
-        cmd = "mkdir -p {}/lib; rm {}/lib/*".format(outpath, outpath)
+        cmd = f"mkdir -p {outpath}/lib; rm {outpath}/lib/*"
         self.runcmd(cmd)
         print("globbing examples")
 
         example_artifacts = glob.glob(
-            "{}/examples/examples{}/*/*.Log".format(self.build_dir, build_type)
+            f"{self.build_dir}/examples/examples{build_type}/*/*.Log"
         )
         example_artifacts.extend(
-            glob.glob(
-                "{}/examples/examples{}/*/*.stdout".format(self.build_dir, build_type)
-            )
+            glob.glob(f"{self.build_dir}/examples/examples{build_type}/*/*.stdout")
         )
         # get information from example results file to accumulate
         ex_result_file = glob.glob(
-            "{}/examples/examples{}/*/*results".format(self.build_dir, build_type)
+            f"{self.build_dir}/examples/examples{build_type}/*/*results"
         )
         if len(ex_result_file) > 0:
             example_results = (
-                subprocess.check_output("cat {}".format(ex_result_file[0]), shell=True)
+                subprocess.check_output(f"cat {ex_result_file[0]}", shell=True)
                 .strip()
                 .decode("utf-8")
             )
         else:
             example_results = "No examples ran"
         # get information from test results files to accumulate
-        test_artifacts = glob.glob(
-            "{}/test/test{}/*/*.Log".format(self.build_dir, build_type)
-        )
-        print("test_artifacts are ".format(test_artifacts))
+        test_artifacts = glob.glob(f"{self.build_dir}/test/test{build_type}/*/*.Log")
+        print("test_artifacts are ", test_artifacts)
         test_artifacts.extend(
-            glob.glob("{}/test/test{}/*/*.stdout".format(self.build_dir, build_type))
+            glob.glob(f"{self.build_dir}/test/test{build_type}/*/*.stdout")
         )
         try:
             unit_results = (
                 subprocess.check_output(
-                    "cat {}/test/test{}/*/unit_tests_results".format(
-                        self.build_dir, build_type
-                    ),
+                    f"cat {self.build_dir}/test/test{build_type}/*/unit_tests_results",
                     shell=True,
                 )
                 .strip()
                 .decode("utf-8")
             )
-        except:
+        except subprocess.CalledProcessError:
             unit_results = "unit tests did not complete"
         try:
             system_results = (
                 subprocess.check_output(
-                    "cat {}/test/test{}/*/system_tests_results".format(
-                        self.build_dir, build_type
-                    ),
+                    "cat {self.build_dir}/test/test{build_type}/*/system_tests_results",
                     shell=True,
                 )
                 .strip()
                 .decode("utf-8")
             )
-        except:
+        except subprocess.CalledProcessError:
             system_results = "system tests did not complete"
         try:
             nuopc_pass = (
                 subprocess.check_output(
-                    "grep PASS: {}/nuopc_{}.log | wc -l".format(
-                        self.build_dir, self.jobid
-                    ),
+                    f"grep PASS: {self.build_dir}/nuopc_{self.data.jobid}.log | wc -l",
                     shell=True,
                 )
                 .strip()
@@ -343,18 +312,16 @@ class ArchiveResults:
             )
             nuopc_fail = (
                 subprocess.check_output(
-                    "grep FAIL: {}/nuopc_{}.log | wc -l".format(
-                        self.build_dir, self.jobid
-                    ),
+                    f"grep FAIL: {self.build_dir}/nuopc_{self.data.jobid}.log | wc -l",
                     shell=True,
                 )
                 .strip()
                 .decode("utf-8")
             )
-        except:
+        except subprocess.CalledProcessError:
             nuopc_pass = 0
             nuopc_fail = 0
-        python_artifacts = glob.glob("{}/src/addon/ESMPy/*.log".format(self.build_dir))
+        python_artifacts = glob.glob(f"{self.build_dir}/src/addon/ESMPy/*.log")
 
         cwd = os.getcwd()
         os.chdir(self.build_dir)
@@ -364,10 +331,8 @@ class ArchiveResults:
             .decode("utf-8")
         )
         os.chdir(cwd)
-        esmfmkfile = glob.glob(
-            "{}/lib/lib{}/*/esmf.mk".format(self.build_dir, build_type)
-        )
-        print("esmfmkfile is {}".format(esmfmkfile))
+        esmfmkfile = glob.glob(f"{self.build_dir}/lib/lib{build_type}/*/esmf.mk")
+        print(f"esmfmkfile is {esmfmkfile}")
         self.create_summary(
             unit_results,
             system_results,
@@ -377,56 +342,47 @@ class ArchiveResults:
             make_info,
             esmfmkfile,
         )
-        timestamp = "build time -- {}".format(self.build_time)
+        timestamp = f"build time -- {self._build_time}"
         for afile in example_artifacts:
-            cmd = "echo {} > {}/examples/{}".format(
-                timestamp, outpath, os.path.basename(afile)
-            )
+            cmd = f"echo {timestamp} > {outpath}/examples/{os.path.basename(afile)}"
             self.runcmd(cmd)
-            cmd = "cat {} >> {}/examples/{}".format(
-                afile, outpath, os.path.basename(afile)
-            )
+            cmd = f"cat {afile} >> {outpath}/examples/{os.path.basename(afile)}"
             #   cmd = 'cp {} {}/examples'.format(afile,outpath)
-            print("cmd is {}".format(cmd))
+            print(f"cmd is {cmd}")
             self.runcmd(cmd)
         for afile in test_artifacts:
-            cmd = "echo {} > {}/test/{}".format(
-                timestamp, outpath, os.path.basename(afile)
-            )
+            cmd = f"echo {timestamp} > {outpath}/test/{os.path.basename(afile)}"
             self.runcmd(cmd)
-            cmd = "cat {} >> {}/test/{}".format(afile, outpath, os.path.basename(afile))
+            cmd = f"cat {afile} >> {outpath}/test/{os.path.basename(afile)}"
             #   cmd = 'cp {} {}/test".format(afile,outpath)
-            print("cmd is {}".format(cmd))
+            print(f"cmd is {cmd}")
             self.runcmd(cmd)
         for afile in esmfmkfile:
-            cmd = "echo {} > {}/lib/{}".format(
-                timestamp, outpath, os.path.basename(afile)
-            )
+            cmd = f"echo {timestamp} > {outpath}/lib/{os.path.basename(afile)}"
             self.runcmd(cmd)
-            cmd = "cat {} >> {}/lib/{}".format(afile, outpath, os.path.basename(afile))
+            cmd = f"cat {afile} >> {outpath}/lib/{os.path.basename(afile)}"
             #   cmd = 'cp {} {}/lib'.format(afile,outpath)
-            print("cmd is {}".format(cmd))
+            print(f"cmd is {cmd}")
             self.runcmd(cmd)
         for afile in python_artifacts:
-            cmd = "echo {} > {}/{}".format(timestamp, outpath, os.path.basename(afile))
+            cmd = f"echo {timestamp} > {outpath}/{os.path.basename(afile)}"
             self.runcmd(cmd)
-            cmd = "cat {} >> {}/{}".format(afile, outpath, os.path.basename(afile))
+            cmd = f"cat {afile} >> {outpath}/{os.path.basename(afile)}"
             #   cmd = 'cp {} {}'.format(afile,outpath)
-            print("cmd is {}".format(cmd))
+            print(f"cmd is {cmd}")
             self.runcmd(cmd)
 
-        git_cmd = "cd {};git checkout {};git add {}/{};git commit -a -m'update for test of {} with hash {} on {} [ci skip]';git push origin {}".format(
-            self.artifacts_root,
-            self.machine_name,
-            dirbranch,
-            self.machine_name,
-            build_basename,
-            self.build_hash,
-            self.machine_name,
-            self.machine_name,
-        )
+        git_cmd = f"cd {self.data.artifacts_root};git checkout {self.data.machine_name};git add {dirbranch}/{self.data.machine_name};git commit -a -m'update for test of {build_basename} with hash {self.build_hash} on {self.data.machine_name} [ci skip]';git push origin {self.data.machine_name}"
         self.runcmd(git_cmd)
         return
+
+
+def get_scheduler(scheduler: Scheduler) -> Scheduler:
+    if scheduler == "pbs":
+        return PBS()
+    elif scheduler == "slurm":
+        return Slurm()
+    return NoScheduler()
 
 
 if __name__ == "__main__":
@@ -479,14 +435,17 @@ if __name__ == "__main__":
     parser.add_argument("-d", "--dryrun", help="dryrun?", required=False, default=False)
     args = vars(parser.parse_args())
 
-    archiver = ArchiveResults(
-        args["self.jobid"],
-        args["buildbasename"],
-        args["machinename"],
-        args["scheduler"],
-        args["testrootdir"],
-        args["artifactsrootdir"],
-        args["mpiversion"],
-        args["branch"],
-        args["dryrun"],
+    data = ArchiveResultsData(
+        root_path=pathlib.Path(__file__).parent.absolute(),
+        jobid=args["jobid"],
+        build_basename=args["buildbasename"],
+        machine_name=args["machinename"],
+        scheduler=args["scheduler"],
+        test_root_dir=args["testrootdir"],
+        artifacts_root=args["artifactsrootdir"],
+        mpiversion=args["mpiversion"],
+        branch=args["branch"],
+        dryrun=args["dryrun"],
     )
+
+    archiver = ArchiveResults(data)
