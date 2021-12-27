@@ -61,13 +61,9 @@ class slurm(Slurm):  # pylint: disable=invalid-name
 def _check_queue(jobid):
     if int(jobid) < 0:
         return True
-    queue_query = (
-        f"sacct -j {jobid} | head -n 3 | tail -n 1 | awk -F ' ' '{{print $6}}'"
-    )
+    queue_query = f"sacct -j {jobid} | head -n 3 | tail -n 1 | awk -F ' ' '{{print $6}}'"
     try:
-        result = (
-            subprocess.check_output(queue_query, shell=True).strip().decode("utf-8")
-        )
+        result = subprocess.check_output(queue_query, shell=True).strip().decode("utf-8")
         return result in ["COMPLETED", "TIMEOUT", "FAILED", "CANCELLED"]
     except subprocess.CalledProcessError:
         return True

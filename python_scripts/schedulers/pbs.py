@@ -200,9 +200,7 @@ def _check_queue(job_id):
         return True
     queue_query = f"qstat -H {job_id} | tail -n 1 | awk -F ' +' '{{print $10}}'"
     try:
-        result = (
-            subprocess.check_output(queue_query, shell=True).strip().decode("utf-8")
-        )
+        result = subprocess.check_output(queue_query, shell=True).strip().decode("utf-8")
         return result in ["F"]
     except subprocess.CalledProcessError:
         return True
