@@ -26,9 +26,9 @@ class ESMFTest:
             self.dryrun = True
         else:
             self.dryrun = False
-        print("setting dryrun to {}".format(self.dryrun))
+        print(f"setting dryrun to {self.dryrun}")
         self.mypath = pathlib.Path(__file__).parent.absolute()
-        print("path is {}".format(self.mypath))
+        print(f"path is {self.mypath}")
         print("calling readyaml")
         self.readYAML()
         if self.reclone == True:
@@ -36,7 +36,7 @@ class ESMFTest:
             rmdir(self.artifacts_root)
             os.system("git clone https://github.com/esmf-org/esmf-test-artifacts.git")
             os.chdir("esmf-test-artifacts")
-            os.system("git checkout -b {}".format(self.machine_name))
+            os.system(f"git checkout -b {self.machine_name}")
             os.chdir("..")
         if self.scheduler_type == "slurm":
             self.scheduler = slurm("slurm")
@@ -50,18 +50,18 @@ class ESMFTest:
     def readYAML(self):
         config_path = os.path.dirname(self.yaml_file)
         global_file = os.path.join(config_path, "global.yaml")
-        print("HEY!!!! {}".format(global_file))
+        print(f"HEY!!!! {global_file}")
         with open(global_file) as file:
             self.global_list = yaml.load(file, Loader=yaml.SafeLoader)
             if "reclone-artifacts" in self.global_list:
                 self.reclone = self.global_list["reclone-artifacts"]
             else:
                 self.reclone = False
-            print("set reclone to {}".format(self.reclone))
+            print(f"set reclone to {self.reclone}")
         with open(self.yaml_file) as file:
             self.machine_list = yaml.load(file, Loader=yaml.SafeLoader)
             self.machine_name = self.machine_list["machine"]
-            print("machine name is {}".format(self.machine_name))
+            print(f"machine name is {self.machine_name}")
             if "git-https" in self.machine_list:
                 self.https = True
             else:
@@ -123,56 +123,40 @@ class ESMFTest:
 
     def runcmd(self, cmd):
         if self.dryrun == True:
-            print("would have executed {}".format(cmd))
+            print(f"would have executed {cmd}")
         else:
-            print("running {}\n".format(cmd))
+            print(f"running {cmd}\n")
             os.system(cmd)
 
     def updateRepo(self, subdir, branch, nuopcbranch):
-        os.system("rm -rf {}".format(subdir))
+        os.system(f"rm -rf {subdir}")
         if not (os.path.isdir(subdir)):
             if self.https == True:
-                cmdstring = (
-                    "git clone -b {} https://github.com/esmf-org/esmf {}".format(
-                        branch, subdir
+                cmdstring = f"git clone -b {branch} https://github.com/esmf-org/esmf {subdir}"
+                nuopcclone = (
+                    "git clone -b {} https://github.com/esmf-org/nuopc-app-prototypes".format(
+                        nuopcbranch
                     )
                 )
-                nuopcclone = "git clone -b {} https://github.com/esmf-org/nuopc-app-prototypes".format(
-                    nuopcbranch
-                )
             else:
-                cmdstring = "git clone -b {} git@github.com:esmf-org/esmf {}".format(
-                    branch, subdir
-                )
+                cmdstring = "git clone -b {} git@github.com:esmf-org/esmf {}".format(branch, subdir)
                 nuopcclone = "git clone -b {} git@github.com:esmf-org/nuopc-app-prototypes".format(
                     nuopcbranch
                 )
             if self.dryrun == True:
-                print("would have executed {}".format(cmdstring))
-                print("would have executed {}".format(nuopcclone))
-                print("would have cd'd to {}".format(subdir))
-                os.system("mkdir {}".format(subdir))
+                print(f"would have executed {cmdstring}")
+                print(f"would have executed {nuopcclone}")
+                print(f"would have cd'd to {subdir}")
+                os.system(f"mkdir {subdir}")
                 os.chdir(subdir)
             else:
-                status = (
-                    subprocess.check_output(cmdstring, shell=True)
-                    .strip()
-                    .decode("utf-8")
-                )
+                status = subprocess.check_output(cmdstring, shell=True).strip().decode("utf-8")
                 os.chdir(subdir)
                 self.runcmd("rm -rf obj mod lib examples test *.o *.e *bat.o* *bat.e*")
-                self.runcmd("git checkout {}".format(branch))
-                self.runcmd("git pull origin {}".format(branch))
-                status = (
-                    subprocess.check_output(nuopcclone, shell=True)
-                    .strip()
-                    .decode("utf-8")
-                )
-                print(
-                    "status from nuopc clone command {} was {}".format(
-                        nuopcclone, status
-                    )
-                )
+                self.runcmd(f"git checkout {branch}")
+                self.runcmd(f"git pull origin {branch}")
+                status = subprocess.check_output(nuopcclone, shell=True).strip().decode("utf-8")
+                print(f"status from nuopc clone command {nuopcclone} was {status}")
 
     def createScripts(self, build_type, comp, ver, mpidict, mpitypes, key, branch):
         mpiflavor = mpidict[key]
@@ -188,27 +172,17 @@ class ESMFTest:
             else:
                 pythonscript = open("runpython.sh", "w")
                 file_out = pythonscript
-                file_out.write("#!{} -l\n".format(self.bash))
-                file_out.write("cd {}\n".format(os.getcwd()))
-                file_out.write(
-                    "export ESMFMKFILE=`find $PWD/DEFAULTINSTALLDIR -iname esmf.mk`\n\n"
-                )
-                file_out.write("cd {}/src/addon/ESMPy\n".format(os.getcwd()))
+                file_out.write(f"#!{self.bash} -l\n")
+                file_out.write(f"cd {os.getcwd()}\n")
+                file_out.write("export ESMFMKFILE=`find $PWD/DEFAULTINSTALLDIR -iname esmf.mk`\n\n")
+                file_out.write(f"cd {os.getcwd()}/src/addon/ESMPy\n")
             if "unloadmodule" in self.machine_list[comp]:
-                file_out.write(
-                    "\nmodule unload {}\n".format(
-                        self.machine_list[comp]["unloadmodule"]
-                    )
-                )
+                file_out.write(f"\nmodule unload {self.machine_list[comp]['unloadmodule']}\n")
             if "modulepath" in self.machine_list:
                 modulepath = self.machine_list["modulepath"]
-                file_out.write(
-                    "\nmodule use {}\n".format(self.machine_list["modulepath"])
-                )
+                file_out.write(f"\nmodule use {self.machine_list['modulepath']}\n")
             if "extramodule" in self.machine_list[comp]:
-                file_out.write(
-                    "\nmodule load {}\n".format(self.machine_list[comp]["extramodule"])
-                )
+                file_out.write(f"\nmodule load {self.machine_list[comp]['extramodule']}\n")
 
             if mpiflavor["module"] == "None":
                 mpiflavor["module"] = ""
@@ -219,9 +193,7 @@ class ESMFTest:
 
             if "mpi_env_vars" in mpidict[key]:
                 for mpi_var in mpidict[key]["mpi_env_vars"]:
-                    file_out.write(
-                        "export {}\n".format(mpidict[key]["mpi_env_vars"][mpi_var])
-                    )
+                    file_out.write(f"export {mpidict[key]['mpi_env_vars'][mpi_var]}\n")
 
             if self.machine_list[comp]["versions"][ver]["netcdf"] == "None":
                 modulecmd = "module load {} {} \n\n".format(
@@ -262,9 +234,7 @@ class ESMFTest:
                 for var in self.machine_list[comp]["versions"][ver]["extra_env_vars"]:
                     file_out.write(
                         "export {}\n".format(
-                            self.machine_list[comp]["versions"][ver]["extra_env_vars"][
-                                var
-                            ]
+                            self.machine_list[comp]["versions"][ver]["extra_env_vars"][var]
                         )
                     )
 
@@ -272,22 +242,20 @@ class ESMFTest:
                 for cmd in self.machine_list[comp]["versions"][ver]["extra_commands"]:
                     file_out.write(
                         "{}\n".format(
-                            self.machine_list[comp]["versions"][ver]["extra_commands"][
-                                cmd
-                            ]
+                            self.machine_list[comp]["versions"][ver]["extra_commands"][cmd]
                         )
                     )
 
-            cmdstring = "export ESMF_DIR={}\n".format(os.getcwd())
+            cmdstring = f"export ESMF_DIR={os.getcwd()}\n"
             file_out.write(cmdstring)
 
-            cmdstring = "export ESMF_COMPILER={}\n".format(comp)
+            cmdstring = f"export ESMF_COMPILER={comp}\n"
             file_out.write(cmdstring)
 
-            cmdstring = "export ESMF_COMM={}\n".format(key)
+            cmdstring = f"export ESMF_COMM={key}\n"
             file_out.write(cmdstring)
 
-            cmdstring = "export ESMF_BOPT='{}'\n".format(build_type)
+            cmdstring = f"export ESMF_BOPT='{build_type}'\n"
             file_out.write(cmdstring)
 
             cmdstring = "export ESMF_TESTEXHAUSTIVE='ON'\n"
@@ -298,15 +266,13 @@ class ESMFTest:
 
             if headerType == "build":
                 #       cmdstring = "make -j {} clean 2>&1| tee clean_$JOBID.log \nmake -j {} 2>&1| tee build_$JOBID.log\n\n".format(self.cpn,self.cpn)
-                cmdstring = "make -j {} 2>&1| tee build_$JOBID.log\n\n".format(self.cpn)
+                cmdstring = f"make -j {self.cpn} 2>&1| tee build_$JOBID.log\n\n"
                 file_out.write(cmdstring)
             elif headerType == "test":
                 cmdstring = "make info 2>&1| tee info.log \nmake install 2>&1| tee install_$JOBID.log \nmake all_tests 2>&1| tee test_$JOBID.log \n"
                 file_out.write(cmdstring)
                 #       file_out.write("ssh {} {}/{}/getres-int.sh\n".format(self.headnodename,self.script_dir,os.getcwd()))
-                cmdstring = (
-                    "export ESMFMKFILE=`find $PWD/DEFAULTINSTALLDIR -iname esmf.mk`\n"
-                )
+                cmdstring = "export ESMFMKFILE=`find $PWD/DEFAULTINSTALLDIR -iname esmf.mk`\n"
                 file_out.write(cmdstring)
                 if mpiflavor["module"] != "None":
                     cmdstring = "chmod +x runpython.sh\ncd nuopc-app-prototypes\n./testProtos.sh 2>&1| tee ../nuopc_$JOBID.log \n\n"
@@ -323,28 +289,28 @@ class ESMFTest:
                 file_out.write(cmdstring)
                 cmdstring = "\nexport PATH=$PATH:$HOME/.local/bin\n".format(os.getcwd())
                 file_out.write(cmdstring)
-                cmdstring = (
-                    "python3 setup.py build 2>&1 | tee python_build.log\n".format(
-                        self.headnodename
-                    )
+                cmdstring = "python3 setup.py build 2>&1 | tee python_build.log\n".format(
+                    self.headnodename
                 )
                 file_out.write(cmdstring)
-                cmdstring = (
-                    "ssh {} {}/runpython.sh 2>&1 | tee python_build.log\n".format(
-                        self.headnodename, os.getcwd()
-                    )
+                cmdstring = "ssh {} {}/runpython.sh 2>&1 | tee python_build.log\n".format(
+                    self.headnodename, os.getcwd()
                 )
                 file_out.write(cmdstring)
                 cmdstring = "python3 setup.py test 2>&1 | tee python_test.log\n".format(
                     self.headnodename
                 )
                 file_out.write(cmdstring)
-                cmdstring = "python3 setup.py test_examples 2>&1 | tee python_examples.log\n".format(
-                    self.headnodename
+                cmdstring = (
+                    "python3 setup.py test_examples 2>&1 | tee python_examples.log\n".format(
+                        self.headnodename
+                    )
                 )
                 file_out.write(cmdstring)
-                cmdstring = "python3 setup.py test_regrid_from_file 2>&1 | tee python_regrid.log\n".format(
-                    self.headnodename
+                cmdstring = (
+                    "python3 setup.py test_regrid_from_file 2>&1 | tee python_regrid.log\n".format(
+                        self.headnodename
+                    )
                 )
                 file_out.write(cmdstring)
             file_out.close()
@@ -357,14 +323,14 @@ class ESMFTest:
     def createGetResScripts(self, monitor_cmd_build, monitor_cmd_test):
         # write these out no matter what, so we can run them manually, if necessary
         get_res_file = open("getres-build.sh", "w")
-        get_res_file.write("#!{} -l\n".format(self.bash))
-        get_res_file.write("{} >& build-res.log &\n".format(monitor_cmd_build))
+        get_res_file.write(f"#!{self.bash} -l\n")
+        get_res_file.write(f"{monitor_cmd_build} >& build-res.log &\n")
         get_res_file.close()
         os.system("chmod +x getres-build.sh")
 
         get_res_file = open("getres-test.sh", "w")
-        get_res_file.write("#!{} -l\n".format(self.bash))
-        get_res_file.write("{} >& test-res.log &\n".format(monitor_cmd_test))
+        get_res_file.write(f"#!{self.bash} -l\n")
+        get_res_file.write(f"{monitor_cmd_test} >& test-res.log &\n")
         get_res_file.close()
         os.system("chmod +x getres-test.sh")
 
@@ -372,7 +338,7 @@ class ESMFTest:
         for build_type in self.build_types:
             for comp in self.machine_list["compiler"]:
                 for ver in self.machine_list[comp]["versions"]:
-                    print("{}".format(self.machine_list[comp]["versions"][ver]["mpi"]))
+                    print(f"{self.machine_list[comp]['versions'][ver]['mpi']}")
                     mpidict = self.machine_list[comp]["versions"][ver]["mpi"]
                     mpitypes = mpidict.keys()
                     print(self.machine_list[comp]["versions"][ver])
@@ -390,22 +356,24 @@ class ESMFTest:
                                 nuopcbranch = self.machine_list["nuopcbranch"]
                             else:
                                 nuopcbranch = branch
-                            subdir = "{}_{}_{}_{}_{}".format(
-                                comp, ver, key, build_type, branch
-                            )
+                            subdir = f"{comp}_{ver}_{key}_{build_type}_{branch}"
                             subdir = re.sub(
                                 "/", "_", subdir
                             )  # Some branches have a slash, so replace that with underscore
                             if self.https == True:
-                                cmdstring = "git clone -b {} https://github.com/esmf-org/esmf {}".format(
-                                    branch, subdir
+                                cmdstring = (
+                                    "git clone -b {} https://github.com/esmf-org/esmf {}".format(
+                                        branch, subdir
+                                    )
                                 )
                                 nuopcclone = "git clone -b {} https://github.com/esmf-org/nuopc-app-prototypes".format(
                                     nuopcbranch
                                 )
                             else:
-                                cmdstring = "git clone -b {} git@github.com:esmf-org/esmf {}".format(
-                                    branch, subdir
+                                cmdstring = (
+                                    "git clone -b {} git@github.com:esmf-org/esmf {}".format(
+                                        branch, subdir
+                                    )
                                 )
                                 nuopcclone = "git clone -b {} git@github.com:esmf-org/nuopc-app-prototypes".format(
                                     nuopcbranch
@@ -428,9 +396,7 @@ class ESMFTest:
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(
-        description="Archive collector for ESMF testing framework"
-    )
+    parser = argparse.ArgumentParser(description="Archive collector for ESMF testing framework")
     parser.add_argument(
         "-w",
         "--workdir",

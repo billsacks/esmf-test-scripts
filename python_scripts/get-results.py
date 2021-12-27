@@ -10,27 +10,17 @@ import pathlib
 
 def checkqueue(jobid, scheduler):
     if scheduler == "slurm":
-        queue_query = (
-            "sacct -j {} | head -n 3 | tail -n 1 | awk -F ' ' '{{print $6}}'".format(
-                jobid
-            )
-        )
+        queue_query = f"sacct -j {jobid} | head -n 3 | tail -n 1 | awk -F ' ' '{{print $6}}'"
     elif scheduler == "pbs":
-        queue_query = "qstat -H {} | tail -n 1 | awk -F ' +' '{{print $10}}'".format(
-            jobid
-        )
+        queue_query = f"qstat -H {jobid} | tail -n 1 | awk -F ' +' '{{print $10}}'"
     elif scheduler == "None":
         return True
     else:
         sys.exit("unsupported job scheduler")
     try:
-        result = (
-            subprocess.check_output(queue_query, shell=True).strip().decode("utf-8")
-        )
+        result = subprocess.check_output(queue_query, shell=True).strip().decode("utf-8")
         if scheduler == "pbs":
-            if (
-                result == "F"
-            ):  # could check for R and Q to see if it is running or waiting
+            if result == "F":  # could check for R and Q to see if it is running or waiting
                 return True
             else:
                 return False
@@ -64,7 +54,7 @@ def copy_artifacts(
     build_basename = os.path.basename(build_dir)
     gitbranch = branch
     dirbranch = re.sub("/", "_", branch)
-    print("build_basename is {}".format(build_basename))
+    print(f"build_basename is {build_basename}")
     parts = build_basename.split("_")
     # [compiler, version, mpiflavor, build_type,dirbranch] = build_basename.split("_")
     compiler = parts[0]
@@ -95,11 +85,11 @@ def copy_artifacts(
         )
     # copy/rename the stdout/stderr files to artifacts out directory
     test_stage = False
-    print("outpath is {}".format(outpath))
+    print(f"outpath is {outpath}")
     for cfile in oe_filelist:
-        print("cfile is {}".format(cfile))
+        print(f"cfile is {cfile}")
         if (
-            cfile.find("test_{}".format(jobid)) != -1
+            cfile.find(f"test_{jobid}") != -1
         ):  # this is just the build job, so no test artifacts yet
             test_stage = True
     if not test_stage:
@@ -108,16 +98,16 @@ def copy_artifacts(
         cmd = "mkdir -p {}/out; rm {}/*/*; rm {}/*.log; rm {}/summary.dat".format(
             outpath, outpath, outpath, outpath
         )
-        print("cmd is {}\n".format(cmd))
+        print(f"cmd is {cmd}\n")
         os.system(cmd)
     # print("oe filelist is {}".format(oe_filelist))
     if oe_filelist == []:
         return
     for cfile in oe_filelist:
-        nfile = os.path.basename(re.sub("_{}".format(jobid), "", cfile))
+        nfile = os.path.basename(re.sub(f"_{jobid}", "", cfile))
         #   print("cfile is {}, and find says {} ".format(cfile,cfile.find('test_{}'.format(jobid))))
-        cp_cmd = "cp {} {}/out/{}".format(cfile, outpath, nfile)
-        print("cp command is {}".format(cp_cmd))
+        cp_cmd = f"cp {cfile} {outpath}/out/{nfile}"
+        print(f"cp command is {cp_cmd}")
         os.system(cp_cmd)
     if not (test_stage):
         git_cmd = "cd {};git checkout {};git add {}/{};git commit -a -m'update for build {} on {} [ci skip]';git push origin {}".format(
@@ -129,49 +119,37 @@ def copy_artifacts(
             machine_name,
             machine_name,
         )
-        print("git_cmd is {}".format(git_cmd))
+        print(f"git_cmd is {git_cmd}")
         os.system(git_cmd)
         return
     # Make directories, if they aren't already there
-    cmd = "mkdir -p {}/examples; rm {}/examples/*; rm {}/*".format(
-        outpath, outpath, outpath
-    )
+    cmd = f"mkdir -p {outpath}/examples; rm {outpath}/examples/*; rm {outpath}/*"
     os.system(cmd)
-    cmd = "mkdir -p {}/apps; rm {}/apps/*".format(outpath, outpath)
+    cmd = f"mkdir -p {outpath}/apps; rm {outpath}/apps/*"
     os.system(cmd)
-    cmd = "mkdir -p {}/test; rm {}/test/*".format(outpath, outpath)
+    cmd = f"mkdir -p {outpath}/test; rm {outpath}/test/*"
     os.system(cmd)
-    cmd = "mkdir -p {}/lib; rm {}/lib/*".format(outpath, outpath)
+    cmd = f"mkdir -p {outpath}/lib; rm {outpath}/lib/*"
     os.system(cmd)
     print("globbing examples")
-    example_artifacts = glob.glob(
-        "{}/examples/examples{}/*/*.Log".format(build_dir, build_type)
-    )
-    example_artifacts.extend(
-        glob.glob("{}/examples/examples{}/*/*.stdout".format(build_dir, build_type))
-    )
+    example_artifacts = glob.glob(f"{build_dir}/examples/examples{build_type}/*/*.Log")
+    example_artifacts.extend(glob.glob(f"{build_dir}/examples/examples{build_type}/*/*.stdout"))
     # get information from example results file to accumulate
-    ex_result_file = glob.glob(
-        "{}/examples/examples{}/*/*results".format(build_dir, build_type)
-    )
+    ex_result_file = glob.glob(f"{build_dir}/examples/examples{build_type}/*/*results")
     if len(ex_result_file) > 0:
         example_results = (
-            subprocess.check_output("cat {}".format(ex_result_file[0]), shell=True)
-            .strip()
-            .decode("utf-8")
+            subprocess.check_output(f"cat {ex_result_file[0]}", shell=True).strip().decode("utf-8")
         )
     else:
         example_results = "No examples ran"
     # get information from test results files to accumulate
-    test_artifacts = glob.glob("{}/test/test{}/*/*.Log".format(build_dir, build_type))
+    test_artifacts = glob.glob(f"{build_dir}/test/test{build_type}/*/*.Log")
     print("test_artifacts are ".format(test_artifacts))
-    test_artifacts.extend(
-        glob.glob("{}/test/test{}/*/*.stdout".format(build_dir, build_type))
-    )
+    test_artifacts.extend(glob.glob(f"{build_dir}/test/test{build_type}/*/*.stdout"))
     try:
         unit_results = (
             subprocess.check_output(
-                "cat {}/test/test{}/*/unit_tests_results".format(build_dir, build_type),
+                f"cat {build_dir}/test/test{build_type}/*/unit_tests_results",
                 shell=True,
             )
             .strip()
@@ -182,9 +160,7 @@ def copy_artifacts(
     try:
         system_results = (
             subprocess.check_output(
-                "cat {}/test/test{}/*/system_tests_results".format(
-                    build_dir, build_type
-                ),
+                f"cat {build_dir}/test/test{build_type}/*/system_tests_results",
                 shell=True,
             )
             .strip()
@@ -193,80 +169,66 @@ def copy_artifacts(
     except:
         system_results = "system tests did not complete"
 
-    python_artifacts = glob.glob("{}/src/addon/ESMPy/*.log".format(build_dir))
+    python_artifacts = glob.glob(f"{build_dir}/src/addon/ESMPy/*.log")
 
     cwd = os.getcwd()
     os.chdir(build_dir)
-    build_hash = (
-        subprocess.check_output("git describe --tags", shell=True)
-        .strip()
-        .decode("utf-8")
-    )
+    build_hash = subprocess.check_output("git describe --tags", shell=True).strip().decode("utf-8")
     make_info = (
         subprocess.check_output("cat module-build.log; cat info.log", shell=True)
         .strip()
         .decode("utf-8")
     )
     os.chdir(cwd)
-    esmfmkfile = glob.glob("{}/lib/lib{}/*/esmf.mk".format(build_dir, build_type))
-    print("esmfmkfile is {}".format(esmfmkfile))
+    esmfmkfile = glob.glob(f"{build_dir}/lib/lib{build_type}/*/esmf.mk")
+    print(f"esmfmkfile is {esmfmkfile}")
     build_time = datetime.datetime.fromtimestamp(os.path.getmtime(esmfmkfile[0]))
-    summary_file = open("{}/summary.dat".format(outpath), "w")
+    summary_file = open(f"{outpath}/summary.dat", "w")
+    summary_file.write("\n===================================================================\n")
     summary_file.write(
-        "\n===================================================================\n"
+        f"Build for = {build_basename}, mpi version {mpiversion} on {machine_name}\n"
     )
-    summary_file.write(
-        "Build for = {}, mpi version {} on {}\n".format(
-            build_basename, mpiversion, machine_name
-        )
-    )
-    summary_file.write("Build time = {}\n".format(build_time))
-    summary_file.write("git hash = {}\n\n".format(build_hash))
+    summary_file.write(f"Build time = {build_time}\n")
+    summary_file.write(f"git hash = {build_hash}\n\n")
     unit_results = re.sub(" FAIL", "\tFAIL", unit_results)
     system_results = re.sub(" FAIL", " \tFAIL", system_results)
     example_results = re.sub(" FAIL", " \tFAIL", example_results)
-    summary_file.write("unit test results   \t{}\n".format(unit_results))
-    summary_file.write("system test results \t{}\n".format(system_results))
-    summary_file.write("example test results \t{}\n\n".format(example_results))
-    summary_file.write(
-        "\n===================================================================\n"
-    )
-    summary_file.write("\n\n{}\n\n".format(make_info))
-    summary_file.write(
-        "\n===================================================================\n"
-    )
+    summary_file.write(f"unit test results   \t{unit_results}\n")
+    summary_file.write(f"system test results \t{system_results}\n")
+    summary_file.write(f"example test results \t{example_results}\n\n")
+    summary_file.write("\n===================================================================\n")
+    summary_file.write(f"\n\n{make_info}\n\n")
+    summary_file.write("\n===================================================================\n")
     summary_file.close()
     # return
-    timestamp = "build time -- {}".format(build_time)
+    timestamp = f"build time -- {build_time}"
     for afile in example_artifacts:
-        cmd = "echo {} > {}/examples/{}".format(
-            timestamp, outpath, os.path.basename(afile)
-        )
+        cmd = f"echo {timestamp} > {outpath}/examples/{os.path.basename(afile)}"
         os.system(cmd)
-        cmd = "cat {} >> {}/examples/{}".format(afile, outpath, os.path.basename(afile))
+        cmd = f"cat {afile} >> {outpath}/examples/{os.path.basename(afile)}"
         #   cmd = 'cp {} {}/examples'.format(afile,outpath)
-        print("cmd is {}".format(cmd))
+        print(f"cmd is {cmd}")
         os.system(cmd)
     for afile in test_artifacts:
-        cmd = "echo {} > {}/test/{}".format(timestamp, outpath, os.path.basename(afile))
+        cmd = f"echo {timestamp} > {outpath}/test/{os.path.basename(afile)}"
         os.system(cmd)
-        cmd = "cat {} >> {}/test/{}".format(afile, outpath, os.path.basename(afile))
+        cmd = f"cat {afile} >> {outpath}/test/{os.path.basename(afile)}"
         #   cmd = 'cp {} {}/test".format(afile,outpath)
-        print("cmd is {}".format(cmd))
+        print(f"cmd is {cmd}")
         os.system(cmd)
     for afile in esmfmkfile:
-        cmd = "echo {} > {}/lib/{}".format(timestamp, outpath, os.path.basename(afile))
+        cmd = f"echo {timestamp} > {outpath}/lib/{os.path.basename(afile)}"
         os.system(cmd)
-        cmd = "cat {} >> {}/lib/{}".format(afile, outpath, os.path.basename(afile))
+        cmd = f"cat {afile} >> {outpath}/lib/{os.path.basename(afile)}"
         #   cmd = 'cp {} {}/lib'.format(afile,outpath)
-        print("cmd is {}".format(cmd))
+        print(f"cmd is {cmd}")
         os.system(cmd)
     for afile in python_artifacts:
-        cmd = "echo {} > {}/{}".format(timestamp, outpath, os.path.basename(afile))
+        cmd = f"echo {timestamp} > {outpath}/{os.path.basename(afile)}"
         os.system(cmd)
-        cmd = "cat {} >> {}/{}".format(afile, outpath, os.path.basename(afile))
+        cmd = f"cat {afile} >> {outpath}/{os.path.basename(afile)}"
         #   cmd = 'cp {} {}'.format(afile,outpath)
-        print("cmd is {}".format(cmd))
+        print(f"cmd is {cmd}")
         os.system(cmd)
 
     git_cmd = "cd {};git checkout {};git add {}/{};git commit -a -m'update for test {} on {} [ci skip]';git push origin {}".format(
@@ -295,24 +257,18 @@ def main(argv):
     branch = sys.argv[8]
     start_time = time.time()
     seconds = 14400
-    build_dir = "{}/{}".format(test_root_dir, build_basename)
+    build_dir = f"{test_root_dir}/{build_basename}"
     while True:
         current_time = time.time()
         elapsed_time = current_time - start_time
         job_done = checkqueue(jobid, scheduler)
         if job_done:
             #     oe_filelist = glob.glob('{}/{}/*{}*'.format(test_root_dir,build_basename,jobid))
-            oe_filelist = glob.glob(
-                "{}/{}/*_{}*.log".format(test_root_dir, build_basename, jobid)
-            )
-            oe_filelist.extend(
-                glob.glob("{}/{}/*.bat".format(test_root_dir, build_basename))
-            )
-            oe_filelist.extend(
-                glob.glob("{}/{}/module-*.log".format(test_root_dir, build_basename))
-            )
-            print("filelist is {}".format(oe_filelist))
-            print("oe list is {}\n".format(oe_filelist))
+            oe_filelist = glob.glob(f"{test_root_dir}/{build_basename}/*_{jobid}*.log")
+            oe_filelist.extend(glob.glob(f"{test_root_dir}/{build_basename}/*.bat"))
+            oe_filelist.extend(glob.glob(f"{test_root_dir}/{build_basename}/module-*.log"))
+            print(f"filelist is {oe_filelist}")
+            print(f"oe list is {oe_filelist}\n")
             copy_artifacts(
                 build_dir,
                 artifacts_root,
