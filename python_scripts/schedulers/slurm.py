@@ -1,3 +1,5 @@
+# pylint: disable=unspecified-encoding
+
 import subprocess
 from collections import namedtuple, defaultdict
 from string import Template
@@ -218,12 +220,7 @@ def batch_test(job_number, test_filename):
     # submit the second job to be dependent on the first
     batch_test_cmd = f"sbatch --depend=afterok:{job_number} {test_filename}"
     print(f"Submitting test_batch with command: {batch_test_cmd}")
-    return (
-        subprocess.check_output(batch_test_cmd, shell=True)
-        .strip()
-        .decode("utf-8")
-        .split()[3]
-    )
+    return fetch_job_number(test_filename)
 
 
 if __name__ == "__main__":
