@@ -1,46 +1,11 @@
 # pylint: disable=unspecified-encoding
 
 import os
-from string import Template
 import subprocess
-from collections import namedtuple, defaultdict
+from collections import namedtuple
+from string import Template
 
-
-TEMPLATE_PATH = "../templates/pbs.build.bat.template"
-
-SCHEDULER_TYPE = "slurm"
-
-TestData = namedtuple(
-    "TestData",
-    [
-        "mypath",
-        "b_filename",
-        "t_filename",
-        "machine_name",
-        "script_dir",
-        "artifacts_root",
-        "fb",
-        "ft",
-    ],
-)
-
-MonitorData = namedtuple(
-    "MonitorData",
-    [
-        "path_",
-        "job_number",
-        "sub_directory",
-        "machine_name",
-        "scheduler_type",
-        "script_directory",
-        "artifacts_root",
-        "mpi_version",
-        "branch",
-        "dryrun",
-        "test_filename",
-        "build_filename",
-    ],
-)
+from schedulers.scheduler import MonitorData, Scheduler, TestData
 
 TemplateData = namedtuple(
     "TemplateData",
@@ -60,10 +25,9 @@ TemplateData = namedtuple(
 ScriptType = namedtuple("ScriptType", ["handler", "type"])
 
 
-class PBS:
-    def __init__(self, scheduler_type):
-        self.type = scheduler_type
-        self.data = defaultdict(str)
+class PBS(Scheduler):
+    TEMPLATE_PATH = "./templates/pbs.build.bat.template"
+    SCHEDULER_TYPE = "pbs"
 
     @property
     def template_data(self) -> TemplateData:
@@ -212,7 +176,7 @@ def _create_headers(template_data: TemplateData, file_info: ScriptType):
         """
 
     result = None
-    with open(TEMPLATE_PATH, "r") as _template:
+    with open(PBS.TEMPLATE_PATH, "r") as _template:
         if file_type == "build":
             template_data._replace(
                 filename_and_time=filename_and_time_template(
