@@ -127,29 +127,35 @@ class ArchiveResults:
     def build_permutation(self) -> BuildPermutation:
         if not self._build_permutation:
             compiler, version, mpiflavor, build_type = self.build_basename.split("_")
-            self._build_permutation = BuildPermutation(compiler, version, mpiflavor, build_type)
+            self._build_permutation = BuildPermutation(
+                compiler, version, mpiflavor, build_type
+            )
         return self._build_permutation
+
+    def fetch_oe_filelist(self):
+        oe_filelist = glob.glob(
+            f"{self.data.test_root_dir}/{self.data.build_basename}/*_{self.data.jobid}*.log"
+        )
+        oe_filelist.extend(
+            glob.glob(f"{self.data.test_root_dir}/{self.data.build_basename}/*.bat")
+        )
+        oe_filelist.extend(
+            glob.glob(
+                f"{self.data.test_root_dir}/{self.data.build_basename}/module-*.log".format()
+            )
+        )
+        return oe_filelist
 
     def monitor(self):
         print(f"dryrun is {self.data.dryrun}")
         start_time = time.time()
-        seconds = 144000
+        seconds = 60 * 60 * 40 # 40 hours?
         while True:
             current_time = time.time()
             elapsed_time = current_time - start_time
             job_done = self.scheduler.checkqueue(self.data.jobid)
             if job_done:
-                oe_filelist = glob.glob(
-                    f"{self.data.test_root_dir}/{self.data.build_basename}/*_{self.data.jobid}*.log"
-                )
-                oe_filelist.extend(
-                    glob.glob(f"{self.data.test_root_dir}/{self.data.build_basename}/*.bat")
-                )
-                oe_filelist.extend(
-                    glob.glob(
-                        f"{self.data.test_root_dir}/{self.data.build_basename}/module-*.log".format()
-                    )
-                )
+                oe_filelist = self.fetch_oe_filelist()
                 print(f"filelist is {oe_filelist}")
                 print(f"oe list is {oe_filelist}\n")
                 self.copy_artifacts(oe_filelist)
@@ -244,7 +250,6 @@ class ArchiveResults:
             self.runcmd(cp_cmd)
 
     def final_stage(self):
-        permutation = self.build_permutation
         command = f"grep success {self.build_dir}/build_{self.data.jobid}.log"
         unit_results = "-1 -1"  # TODO Update this as per discussion early December
         system_results = "-1 -1"
@@ -270,11 +275,8 @@ class ArchiveResults:
                 .decode("utf-8")
             )
         except subprocess.CalledProcessError:
-            make_info = (
-                f"error finding {self.build_dir}/module-build.log or {self.build_dir}/info.log"
-            )
+            make_info = f"error finding {self.build_dir}/module-build.log or {self.build_dir}/info.log"
 
-        esmfmkfile = glob.glob(f"{self.build_dir}/lib/lib{permutation.build_type}/*/esmf.mk")
         _data = SummaryData(
             unit_results=unit_results,
             system_results=system_results,
@@ -282,7 +284,7 @@ class ArchiveResults:
             nuopc_pass=nuopc_pass,
             nuopc_fail=nuopc_fail,
             make_info=make_info,
-            esmfmkfile=esmfmkfile,
+            esmfmkfile=self.esmfmkfile,
         )
         self.create_summary(_data)
         git_cmd = f"cd {self.data.artifacts_root};git checkout {self.data.machine_name};git add {self.dirbranch}/{self.data.machine_name};git commit -a -m'update for build of {self.build_basename} with hash {self.build_hash} on {self.data.machine_name} [ci skip]';git push origin {self.data.machine_name}"
@@ -302,9 +304,13 @@ class ArchiveResults:
 
     def collect_example_artifacts(self) -> List[Any]:
         permutation = self.build_permutation
-        results = glob.glob(f"{self.build_dir}/examples/examples{permutation.build_type}/*/*.Log")
+        results = glob.glob(
+            f"{self.build_dir}/examples/examples{permutation.build_type}/*/*.Log"
+        )
         results.extend(
-            glob.glob(f"{self.build_dir}/examples/examples{permutation.build_type}/*/*.stdout")
+            glob.glob(
+                f"{self.build_dir}/examples/examples{permutation.build_type}/*/*.stdout"
+            )
         )
         return results
 
@@ -325,9 +331,13 @@ class ArchiveResults:
 
     def collect_test_artifacts(self) -> List[Any]:
         permutation = self.build_permutation
-        results = glob.glob(f"{self.build_dir}/test/test{permutation.build_type}/*/*.Log")
+        results = glob.glob(
+            f"{self.build_dir}/test/test{permutation.build_type}/*/*.Log"
+        )
         print("test_artifacts are ", results)
-        results.extend(glob.glob(f"{self.build_dir}/test/test{permutation.build_type}/*/*.stdout"))
+        results.extend(
+            glob.glob(f"{self.build_dir}/test/test{permutation.build_type}/*/*.stdout")
+        )
         return results
 
     def collect_unit_results(self):
