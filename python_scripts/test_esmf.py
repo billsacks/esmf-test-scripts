@@ -231,7 +231,7 @@ class ESMFTest:
       file_out.write(cmdstring)
 
       if(headerType == "build"):
-#       cmdstring = "make -j {} clean 2>&1| tee clean_$JOBID.log \nmake -j {} 2>&1| tee build_$JOBID.log\n\n".format(self.cpn,self.cpn)
+
         cmdstring = "make -j {} 2>&1| tee build_$JOBID.log\n\n".format(self.cpn)
         file_out.write(cmdstring)
       elif(headerType == "test"):
