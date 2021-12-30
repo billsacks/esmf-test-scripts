@@ -23,9 +23,7 @@ def rmdir(path):
     shutil.rmtree(path)
 
 
-ESMFTestData = namedtuple(
-    "ESMFTestData", ["yaml_file", "artifacts_root", "workdir", "dryrun"]
-)
+ESMFTestData = namedtuple("ESMFTestData", ["yaml_file", "artifacts_root", "workdir", "dryrun"])
 
 
 def namedtuple_with_defaults(typename, field_names, default_values=()):
@@ -41,6 +39,7 @@ def namedtuple_with_defaults(typename, field_names, default_values=()):
 
 
 def uname():
+
     try:
         return os.uname()[1]
     except:
@@ -72,21 +71,17 @@ class ESMFTest:
     build_types = ["O", "g"]
 
     def __init__(self, data: ESMFTestData):
+        self.build_time = "1:00:00"
+        self.test_time = "1:00:00"
+
         self._data = data
         self._scheduler = None
+        self._mpiver = None
 
-        print("calling readyaml")
-        self.global_properties, self.machine_properties = self._readYAML(
+        self.global_properties, self.machine_properties = fetch_yaml_properties(
             local_yaml_config_path=data.yaml_file,
             global_yaml_config_path=self.global_yaml_config_path,
         )
-
-        print(
-            self._data.yaml_file,
-            self._data.artifacts_root,
-            self._data.workdir,
-        )
-        self.createJobCardsAndSubmit()
 
     @property
     def scheduler(self):
@@ -117,6 +112,133 @@ class ESMFTest:
     def https(self):
         return "git-https" in self.machine_properties
 
+    @property
+    def python_script_header(self):
+        return [
+            f"#!{self.machine_properties.bash} -l\n",
+            f"cd {os.getcwd()}\n",
+            "export ESMFMKFILE=`find $PWD/DEFAULTINSTALLDIR -iname esmf.mk`\n\n",
+            f"cd {os.getcwd()}/src/addon/ESMPy\n",
+        ]
+
+    def runcmd(self, cmd):
+        _runcmd(cmd, self.dryrun)
+
+    def create_scripts(self, build_type, comp, ver, mpidict, key):
+        mpiflavor = mpidict[key]
+        for header_type in _get_header_list(mpidict[key]):
+            is_python = header_type not in ["build", "test"]
+            file_out_name = (
+                _filename(header_type, comp, ver, key, build_type)
+                if not is_python
+                else "runpython.sh"
+            )
+            with open(file_out_name, "w") as file_out:
+                if is_python:
+                    file_out.writelines(self.python_script_header)
+
+                if "unloadmodule" in self.machine_properties[comp]:
+                    file_out.write(
+                        f"\nmodule unload {self.machine_properties[comp]['unloadmodule']}\n"
+                    )
+                if "modulepath" in self.machine_properties:
+                    file_out.write(f"\nmodule use {self.machine_properties['modulepath']}\n")
+                if "extramodule" in self.machine_properties[comp]:
+                    file_out.write(
+                        f"\nmodule load {self.machine_properties[comp]['extramodule']}\n"
+                    )
+
+                if mpiflavor["module"] == "None":
+                    mpiflavor["module"] = ""
+                    file_out.write(
+                        f"export ESMF_MPIRUN={os.getcwd()}/src/Infrastructure/stubs/mpiuni/mpirun\n"
+                    )
+
+                compiler_version = self.machine_properties[comp]["versions"][ver]
+                netcdf = self.machine_properties[comp]["versions"][ver]["netcdf"]
+
+                _write_mpi_environment_variables(mpidict[key], file_out)
+                _write_netcdf(
+                    netcdf,
+                    mpiflavor["module"],
+                    file_out,
+                )
+
+                if "hdf5" in compiler_version:
+                    hdf5 = compiler_version["hdf5"]
+                    file_out.write(f"module load {hdf5} \n")
+
+                if "netcdf-fortran" in compiler_version:
+                    netcdf_fortran = compiler_version["netcdf-fortran"]
+                    file_out.write(f"module load {netcdf_fortran} \n")
+
+                file_out.write(f"module list >& module-{header_type}.log\n\n")
+                file_out.write("set -x\n")
+                file_out.write("export ESMF_NETCDF=nc-config\n\n" if netcdf else "\n")
+
+                _write_extra_env_vars(compiler_version, file_out)
+                _write_extra_commands(compiler_version, file_out)
+                _write_vars(file_out=file_out, build_type=build_type, comp=comp, key=key)
+
+                if header_type == "build":
+
+                    file_out.write(
+                        f"make -j {self.machine_properties.cpn} 2>&1| tee build_$JOBID.log\n\n"
+                    )
+                elif header_type == "test":
+                    lines = [
+                        "make info 2>&1| tee info.log \nmake install 2>&1| tee install_$JOBID.log \nmake all_tests 2>&1| tee test_$JOBID.log \n",
+                        "export ESMFMKFILE=`find $PWD/DEFAULTINSTALLDIR -iname esmf.mk`\n",
+                    ]
+                    file_out.writelines(lines)
+                    if mpiflavor["module"] != "None":
+
+                        file_out.write(
+                            "chmod +x runpython.sh\ncd nuopc-app-prototypes\n./testProtos.sh 2>&1| tee ../nuopc_$JOBID.log \n\n"
+                        )
+                else:
+                    file_out.write(
+                        "python3 setup.py test_examples_dryrun\npython3 setup.py test_regrid_from_file_dryrun\n"
+                    )
+                if ("pythontest" in mpiflavor) and (header_type == "test"):
+                    self._write_python_test(file_out)
+                if mpiflavor["module"] != "":
+                    self._mpiver = mpiflavor["module"].split("/")[-1]
+
+    def create_job_card_and_submit(self):
+        # TODO replace nested loops with itertools
+        for build_type in self.build_types:
+            for comp in self.machine_properties["compiler"]:
+                for ver in self.machine_properties[comp]["versions"]:
+                    print(f"{self.machine_properties[comp]['versions'][ver]['mpi']}")
+                    mpidict = self.machine_properties[comp]["versions"][ver]["mpi"]
+                    mpitypes = mpidict.keys()
+                    print(self.machine_properties[comp]["versions"][ver])
+                    for key in mpitypes:
+
+                        if "build_time" in self.machine_properties[comp]:
+                            self.build_time = self.machine_properties[comp]["build_time"]
+
+                        if "test_time" in self.machine_properties[comp]:
+                            self.test_time = self.machine_properties[comp]["test_time"]
+
+                        for branch in self.machine_properties["branch"]:
+                            nuopcbranch = branch
+                            if "nuopcbranch" in self.machine_properties:
+                                nuopcbranch = self.machine_properties["nuopcbranch"]
+
+                            subdir = f"{comp}_{ver}_{key}_{build_type}_{branch}"
+                            subdir = re.sub(
+                                "/", "_", subdir
+                            )  # Some branches have a slash, so replace that with underscore
+
+                            update_repo(subdir, branch, nuopcbranch)
+
+                            self.scheduler.createHeaders(self)
+                            self.create_scripts(build_type, comp, ver, mpidict, key)
+                            self.scheduler.submitJob(self, subdir, self._mpiver, branch)
+                            os.chdir("..")
+
     def _reclone(self):
         print("recloning")
         rmdir(self._data.artifacts_root)
@@ -125,169 +247,12 @@ class ESMFTest:
         os.system(f"git checkout -b {self.machine_properties.machine_name}")
         os.chdir("..")
 
-    def _readYAML(self, *, global_yaml_config_path, local_yaml_config_path) -> Tuple:
-        with open(global_yaml_config_path) as file:
-            global_properties = GlobalProperties(
-                **yaml.load(file, Loader=yaml.SafeLoader)
-            )
-        with open(local_yaml_config_path) as file:
-
-            machine_properties = MachineProperties(
-                **yaml.load(file, Loader=yaml.SafeLoader)
-            )
-        return global_properties, machine_properties
-
     def _traverse(self):
         for comp in self.machine_properties["compiler"]:
             for ver in self.machine_properties[comp]["versions"]:
                 print(self.machine_properties[comp]["versions"][ver])
 
-    def runcmd(self, cmd):
-        if self.dryrun == True:
-            print(f"would have executed {cmd}")
-        else:
-            print(f"running {cmd}\n")
-            os.system(cmd)
-
-    def createScripts(self, build_type, comp, ver, mpidict, key):
-        mpiflavor = mpidict[key]
-        if "pythontest" in mpiflavor:
-            headerList = ["build", "test", "python"]
-        else:
-            headerList = ["build", "test"]
-        for headerType in headerList:
-            if headerType == "build":
-                file_out = self.fb
-            elif headerType == "test":
-                file_out = self.ft
-            else:
-                pythonscript = open("runpython.sh", "w")
-                file_out = pythonscript
-                file_out.write(f"#!{self.machine_properties.bash} -l\n")
-                file_out.write(f"cd {os.getcwd()}\n")
-                file_out.write(
-                    "export ESMFMKFILE=`find $PWD/DEFAULTINSTALLDIR -iname esmf.mk`\n\n"
-                )
-                file_out.write(f"cd {os.getcwd()}/src/addon/ESMPy\n")
-            if "unloadmodule" in self.machine_properties[comp]:
-                file_out.write(
-                    f"\nmodule unload {self.machine_properties[comp]['unloadmodule']}\n"
-                )
-            if "modulepath" in self.machine_properties:
-                file_out.write(
-                    f"\nmodule use {self.machine_properties['modulepath']}\n"
-                )
-            if "extramodule" in self.machine_properties[comp]:
-                file_out.write(
-                    f"\nmodule load {self.machine_properties[comp]['extramodule']}\n"
-                )
-
-            if mpiflavor["module"] == "None":
-                mpiflavor["module"] = ""
-                cmdstring = "export ESMF_MPIRUN={}/src/Infrastructure/stubs/mpiuni/mpirun\n".format(
-                    os.getcwd()
-                )
-                file_out.write(cmdstring)
-
-            if "mpi_env_vars" in mpidict[key]:
-                for mpi_var in mpidict[key]["mpi_env_vars"]:
-                    file_out.write(f"export {mpidict[key]['mpi_env_vars'][mpi_var]}\n")
-
-            if self.machine_properties[comp]["versions"][ver]["netcdf"] == "None":
-                modulecmd = "module load {} {} \n\n".format(
-                    self.machine_properties[comp]["versions"][ver]["compiler"],
-                    mpiflavor["module"],
-                )
-                esmfnetcdf = "\n"
-                file_out.write(modulecmd)
-            else:
-                modulecmd = "module load {} {} {}\n".format(
-                    self.machine_properties[comp]["versions"][ver]["compiler"],
-                    mpiflavor["module"],
-                    self.machine_properties[comp]["versions"][ver]["netcdf"],
-                )
-                esmfnetcdf = "export ESMF_NETCDF=nc-config\n\n"
-                file_out.write(modulecmd)
-
-            if "hdf5" in self.machine_properties[comp]["versions"][ver]:
-                modulecmd = "module load {} \n".format(
-                    self.machine_properties[comp]["versions"][ver]["hdf5"]
-                )
-                file_out.write(modulecmd)
-            if "netcdf-fortran" in self.machine_properties[comp]["versions"][ver]:
-                modulecmd = "module load {} \n".format(
-                    self.machine_properties[comp]["versions"][ver]["netcdf-fortran"]
-                )
-                file_out.write(modulecmd)
-
-            if headerType == "build":
-                file_out.write("module list >& module-build.log\n\n")
-            else:
-                file_out.write("module list >& module-test.log\n\n")
-
-            file_out.write("set -x\n")
-            file_out.write(esmfnetcdf)
-
-            if "extra_env_vars" in self.machine_properties[comp]["versions"][ver]:
-                for var in self.machine_properties[comp]["versions"][ver][
-                    "extra_env_vars"
-                ]:
-                    file_out.write(
-                        "export {}\n".format(
-                            self.machine_properties[comp]["versions"][ver][
-                                "extra_env_vars"
-                            ][var]
-                        )
-                    )
-
-            if "extra_commands" in self.machine_properties[comp]["versions"][ver]:
-                for cmd in self.machine_properties[comp]["versions"][ver][
-                    "extra_commands"
-                ]:
-                    file_out.write(
-                        "{}\n".format(
-                            self.machine_properties[comp]["versions"][ver][
-                                "extra_commands"
-                            ][cmd]
-                        )
-                    )
-
-            self.write_vars(
-                file_out=file_out, build_type=build_type, comp=comp, key=key
-            )
-
-            if headerType == "build":
-                #       cmdstring = "make -j {} clean 2>&1| tee clean_$JOBID.log \nmake -j {} 2>&1| tee build_$JOBID.log\n\n".format(self.cpn,self.cpn)
-                cmdstring = f"make -j {self.machine_properties.cpn} 2>&1| tee build_$JOBID.log\n\n"
-                file_out.write(cmdstring)
-            elif headerType == "test":
-                cmdstring = "make info 2>&1| tee info.log \nmake install 2>&1| tee install_$JOBID.log \nmake all_tests 2>&1| tee test_$JOBID.log \n"
-                file_out.write(cmdstring)
-                #       file_out.write("ssh {} {}/{}/getres-int.sh\n".format(self.headnodename,self.script_dir,os.getcwd()))
-                cmdstring = (
-                    "export ESMFMKFILE=`find $PWD/DEFAULTINSTALLDIR -iname esmf.mk`\n"
-                )
-                file_out.write(cmdstring)
-                if mpiflavor["module"] != "None":
-                    cmdstring = "chmod +x runpython.sh\ncd nuopc-app-prototypes\n./testProtos.sh 2>&1| tee ../nuopc_$JOBID.log \n\n"
-                    file_out.write(cmdstring)
-            #         file_out.write("ssh {} {}/{}/getres-int.sh\n".format(self.headnodename,self.script_dir,os.getcwd()))
-            else:
-                cmdstring = "python3 setup.py test_examples_dryrun\npython3 setup.py test_regrid_from_file_dryrun\n"
-                file_out.write(cmdstring)
-            #       file_out.write("ssh {} {}/{}/getres-int.sh\n".format(self.headnodename,self.script_dir,os.getcwd()))
-
-            if ("pythontest" in mpiflavor) and (headerType == "test"):
-                self.write_python_test(file_out)
-
-            file_out.close()
-            mpimodule = mpiflavor["module"]
-            if mpimodule == "":
-                self.mpiver = "None"
-            else:
-                self.mpiver = mpiflavor["module"].split("/")[-1]
-
-    def write_python_test(self, file_out):
+    def _write_python_test(self, file_out):
         cmds = [
             "cd ../src/addon/ESMPy",
             "export PATH=$PATH:$HOME/.local/bin",
@@ -299,90 +264,64 @@ class ESMFTest:
         ]
         file_out.writelines(cmds)
 
-    def write_vars(self, file_out, comp, key, build_type):
-        cmds = [
-            f"export ESMF_DIR={os.getcwd()}\n"
-            f"export ESMF_COMPILER={comp}\n"
-            f"export ESMF_COMM={key}\n"
-            f"export ESMF_BOPT='{build_type}'\n"
-            "export ESMF_TESTEXHAUSTIVE='ON'\n"
-            "export ESMF_TESTWITHTHREADS='ON'\n"
-        ]
-        file_out.writelines(cmds)
 
-    def createJobCardsAndSubmit(self):
-        for build_type in self.build_types:
-            for comp in self.machine_properties["compiler"]:
-                for ver in self.machine_properties[comp]["versions"]:
-                    print(f"{self.machine_properties[comp]['versions'][ver]['mpi']}")
-                    mpidict = self.machine_properties[comp]["versions"][ver]["mpi"]
-                    mpitypes = mpidict.keys()
-                    print(self.machine_properties[comp]["versions"][ver])
-                    for key in mpitypes:
-                        if "build_time" in self.machine_properties[comp]:
-                            self.build_time = self.machine_properties[comp][
-                                "build_time"
-                            ]
-                        else:
-                            self.build_time = "1:00:00"
-                        if "test_time" in self.machine_properties[comp]:
-                            self.test_time = self.machine_properties[comp]["test_time"]
-                        else:
-                            self.test_time = "1:00:00"
-                        for branch in self.machine_properties["branch"]:
-                            if "nuopcbranch" in self.machine_properties:
-                                nuopcbranch = self.machine_properties["nuopcbranch"]
-                            else:
-                                nuopcbranch = branch
-                            subdir = f"{comp}_{ver}_{key}_{build_type}_{branch}"
-                            subdir = re.sub(
-                                "/", "_", subdir
-                            )  # Some branches have a slash, so replace that with underscore
+def fetch_yaml_properties(*, global_yaml_config_path, local_yaml_config_path) -> Tuple:
+    with open(global_yaml_config_path) as file:
+        global_properties = GlobalProperties(**yaml.load(file, Loader=yaml.SafeLoader))
+    with open(local_yaml_config_path) as file:
 
-                            updateRepo(subdir, branch, nuopcbranch)
-                            self.b_filename = "build-{}_{}_{}_{}.bat".format(
-                                comp, ver, key, build_type
-                            )
-                            self.t_filename = "test-{}_{}_{}_{}.bat".format(
-                                comp, ver, key, build_type
-                            )
-                            self.fb = open(self.b_filename, "w")
-                            self.ft = open(self.t_filename, "w")
-                            self.scheduler.createHeaders(self)
-                            self.createScripts(build_type, comp, ver, mpidict, key)
-                            self.scheduler.submitJob(self, subdir, self.mpiver, branch)
-                            os.chdir("..")
+        machine_properties = MachineProperties(**yaml.load(file, Loader=yaml.SafeLoader))
+    return global_properties, machine_properties
 
 
-def updateRepo(subdir, branch, nuopcbranch, is_dryrun=False):
+def update_repo(subdir, branch, nuopcbranch, is_dryrun=False):
     os.system(f"rm -rf {subdir}")
-    if not (os.path.isdir(subdir)):
+    if not os.path.isdir(subdir):
 
         cmdstring = f"git clone -b {branch} git@github.com:esmf-org/esmf {subdir}"
-        nuopcclone = (
-            f"git clone -b {nuopcbranch} git@github.com:esmf-org/nuopc-app-prototypes"
-        )
+        nuopcclone = f"git clone -b {nuopcbranch} git@github.com:esmf-org/nuopc-app-prototypes"
         if is_dryrun is True:
             print(f"would have executed {cmdstring}")
             print(f"would have executed {nuopcclone}")
             print(f"would have cd'd to {subdir}")
+            return
 
-        else:
-            status = []
-            status.append(
-                subprocess.check_output(cmdstring, shell=True).strip().decode("utf-8")
-            )
+        status = []
+        status.append(subprocess.check_output(cmdstring, shell=True).strip().decode("utf-8"))
 
-            # TODO create directory if doesnt exist using native
-            os.chdir(subdir)
-            _runcmd("rm -rf obj mod lib examples test *.o *.e *bat.o* *bat.e*")
-            _runcmd(f"git checkout {branch}")
-            _runcmd(f"git pull origin {branch}")
-            status.append(
-                subprocess.check_output(nuopcclone, shell=True).strip().decode("utf-8")
-            )
+        # TODO create directory if doesnt exist using native
+        os.chdir(subdir)
+        _runcmd("rm -rf obj mod lib examples test *.o *.e *bat.o* *bat.e*")
+        _runcmd(f"git checkout {branch}")
+        _runcmd(f"git pull origin {branch}")
+        status.append(subprocess.check_output(nuopcclone, shell=True).strip().decode("utf-8"))
 
-            print(f"status from nuopc clone command {nuopcclone} was {status}")
+        print(f"status from nuopc clone command {nuopcclone} was {status}")
+
+
+def _write_mpi_environment_variables(mpidict, file_handle):
+    if "mpi_env_vars" in mpidict:
+        for mpi_var in mpidict["mpi_env_vars"]:
+            file_handle.write(f"export {mpidict['mpi_env_vars'][mpi_var]}\n")
+
+
+def _write_netcdf(netcdf, file_handle, mpi_module_flavor):
+    if netcdf == "None":
+        file_handle.write(f"module load {netcdf} {mpi_module_flavor} \n\n")
+    else:
+        file_handle.write(f"module load {netcdf} {mpi_module_flavor} {netcdf}\n")
+
+
+def _write_extra_env_vars(compiler_version, file_handle):
+    if "extra_env_vars" in compiler_version:
+        for var in compiler_version["extra_env_vars"]:
+            file_handle.write(f"export {var}\n")
+
+
+def _write_extra_commands(compiler_version, file_handle):
+    if "extra_commands" in compiler_version:
+        for cmd in compiler_version["extra_commands"]:
+            file_handle.write(f"{cmd}\n")
 
 
 def _runcmd(cmd, is_dryrun=False):
@@ -393,10 +332,36 @@ def _runcmd(cmd, is_dryrun=False):
         os.system(cmd)
 
 
+def _filename(run_type, comp, ver, key, build_type):
+    return f"{run_type}-{comp}_{ver}_{key}_{build_type}.bat"
+
+
+def _write_vars(file_out, comp, key, build_type):
+    cmds = [
+        f"export ESMF_DIR={os.getcwd()}\n"
+        f"export ESMF_COMPILER={comp}\n"
+        f"export ESMF_COMM={key}\n"
+        f"export ESMF_BOPT='{build_type}'\n"
+        "export ESMF_TESTEXHAUSTIVE='ON'\n"
+        "export ESMF_TESTWITHTHREADS='ON'\n"
+    ]
+    file_out.writelines(cmds)
+
+
+def _get_header_list(mpi_flavor):
+    _header_list = ["build", "test"]
+    if "pythontest" in mpi_flavor:
+        _header_list.append("python")
+    return _header_list
+
+
 def get_args():
-    parser = argparse.ArgumentParser(
-        description="Archive collector for ESMF testing framework"
-    )
+    """get_args
+
+    Returns:
+        list:
+    """
+    parser = argparse.ArgumentParser(description="Archive collector for ESMF testing framework")
     parser.add_argument(
         "-w",
         "--workdir",
@@ -429,7 +394,6 @@ def get_args():
 if __name__ == "__main__":
     args = get_args()
 
-    _data = ESMFTestData(
-        args["yaml"], args["artifacts"], args["workdir"], args["dryrun"]
-    )
+    _data = ESMFTestData(args["yaml"], args["artifacts"], args["workdir"], args["dryrun"])
     test = ESMFTest(_data)
+    test.create_job_card_and_submit()
