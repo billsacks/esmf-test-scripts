@@ -1,87 +1,32 @@
 # pylint: disable=unspecified-encoding
 
-import argparse
-from collections import namedtuple
-
-
 import os
 import pathlib
 import re
-import shutil
-import subprocess
-from typing import Tuple
+from collections import namedtuple
 
-
-import yaml
 
 from schedulers.noscheduler import NoScheduler
 from schedulers.pbs import pbs
 from schedulers.slurm import slurm
 
+from shared import update_repo, rmdir
 
-def rmdir(path):
-    shutil.rmtree(path)
-
-
-ESMFTestData = namedtuple("ESMFTestData", ["yaml_file", "artifacts_root", "workdir", "dryrun"])
-
-
-def namedtuple_with_defaults(typename, field_names, default_values=()):
-    # Python 3.6
-    T = namedtuple(typename, field_names)
-    T.__new__.__defaults__ = (None,) * len(T._fields)
-    if isinstance(default_values, dict):
-        prototype = T(**default_values)
-    else:
-        prototype = T(*default_values)
-    T.__new__.__defaults__ = tuple(prototype)
-    return T
-
-
-def uname():
-
-    try:
-        return os.uname()[1]
-    except:
-        return ""
-
-
-GlobalProperties = namedtuple("GlobalProperties", ["reclone-artifacts"])
-
-MachineProperties = namedtuple_with_defaults(
-    "MachineProperties",
-    [
-        "bash",
-        "account",
-        "partition",
-        "queue",
-        "headnodename",
-        "nuopcbranch",
-        "corespernode",
-        "scheduler",
-        "cluster",
-        "constraint",
-        "git-https",
-    ],
-    {"bash": "/bin/bash", "headnodename": uname(), "nuopcbranch": "develop"},
+ESMFTestData = namedtuple(
+    "ESMFTestData", ["yaml_file", "artifacts_root", "workdir", "dryrun"]
 )
 
 
 class ESMFTest:
     build_types = ["O", "g"]
 
-    def __init__(self, data: ESMFTestData):
-        self.build_time = "1:00:00"
-        self.test_time = "1:00:00"
+    def __init__(self, data: ESMFTestData, machine_properties):
 
         self._data = data
         self._scheduler = None
         self._mpiver = None
 
-        self.global_properties, self.machine_properties = fetch_yaml_properties(
-            local_yaml_config_path=data.yaml_file,
-            global_yaml_config_path=self.global_yaml_config_path,
-        )
+        self.machine_properties = machine_properties
 
     @property
     def scheduler(self):
@@ -91,16 +36,20 @@ class ESMFTest:
         return self._scheduler
 
     @property
+    def artifacts_root(self):
+        return self._data.artifacts_root
+
+    @property
     def script_dir(self):
         return os.getcwd()
 
     @property
-    def mypath(self):
-        return pathlib.Path(__file__).parent.absolute()
+    def machine_name(self):
+        return self.machine_properties.machine_name
 
     @property
-    def global_yaml_config_path(self):
-        return os.path.join(str(os.path.dirname(self._data.yaml_file)), "global.yaml")
+    def do_reclone(self):
+        return self.machine_properties["reclone-artifacts"]
 
     @property
     def dryrun(self):
@@ -121,8 +70,10 @@ class ESMFTest:
             f"cd {os.getcwd()}/src/addon/ESMPy\n",
         ]
 
-    def runcmd(self, cmd):
-        _runcmd(cmd, self.dryrun)
+    def get_time_by_type(self, comp, type: str):
+        if f"{type}_time" in self.machine_properties[comp]:
+            return self.machine_properties[comp][f"{type}_time"]
+        return "1:00:00"
 
     def create_scripts(self, build_type, comp, ver, mpidict, key):
         mpiflavor = mpidict[key]
@@ -142,7 +93,9 @@ class ESMFTest:
                         f"\nmodule unload {self.machine_properties[comp]['unloadmodule']}\n"
                     )
                 if "modulepath" in self.machine_properties:
-                    file_out.write(f"\nmodule use {self.machine_properties['modulepath']}\n")
+                    file_out.write(
+                        f"\nmodule use {self.machine_properties['modulepath']}\n"
+                    )
                 if "extramodule" in self.machine_properties[comp]:
                     file_out.write(
                         f"\nmodule load {self.machine_properties[comp]['extramodule']}\n"
@@ -178,7 +131,9 @@ class ESMFTest:
 
                 _write_extra_env_vars(compiler_version, file_out)
                 _write_extra_commands(compiler_version, file_out)
-                _write_vars(file_out=file_out, build_type=build_type, comp=comp, key=key)
+                _write_vars(
+                    file_out=file_out, build_type=build_type, comp=comp, key=key
+                )
 
                 if header_type == "build":
 
@@ -216,12 +171,6 @@ class ESMFTest:
                     print(self.machine_properties[comp]["versions"][ver])
                     for key in mpitypes:
 
-                        if "build_time" in self.machine_properties[comp]:
-                            self.build_time = self.machine_properties[comp]["build_time"]
-
-                        if "test_time" in self.machine_properties[comp]:
-                            self.test_time = self.machine_properties[comp]["test_time"]
-
                         for branch in self.machine_properties["branch"]:
                             nuopcbranch = branch
                             if "nuopcbranch" in self.machine_properties:
@@ -239,15 +188,9 @@ class ESMFTest:
                             self.scheduler.submitJob(self, subdir, self._mpiver, branch)
                             os.chdir("..")
 
-    def _reclone(self):
-        print("recloning")
-        rmdir(self._data.artifacts_root)
-        os.system("git clone https://github.com/esmf-org/esmf-test-artifacts.git")
-        os.chdir("esmf-test-artifacts")
-        os.system(f"git checkout -b {self.machine_properties.machine_name}")
-        os.chdir("..")
-
     def _traverse(self):
+        """Not sure if needed"""
+        # TODO Deprecate
         for comp in self.machine_properties["compiler"]:
             for ver in self.machine_properties[comp]["versions"]:
                 print(self.machine_properties[comp]["versions"][ver])
@@ -263,40 +206,6 @@ class ESMFTest:
             "python3 setup.py test_regrid_from_file 2>&1 | tee python_regrid.log",
         ]
         file_out.writelines(cmds)
-
-
-def fetch_yaml_properties(*, global_yaml_config_path, local_yaml_config_path) -> Tuple:
-    with open(global_yaml_config_path) as file:
-        global_properties = GlobalProperties(**yaml.load(file, Loader=yaml.SafeLoader))
-    with open(local_yaml_config_path) as file:
-
-        machine_properties = MachineProperties(**yaml.load(file, Loader=yaml.SafeLoader))
-    return global_properties, machine_properties
-
-
-def update_repo(subdir, branch, nuopcbranch, is_dryrun=False):
-    os.system(f"rm -rf {subdir}")
-    if not os.path.isdir(subdir):
-
-        cmdstring = f"git clone -b {branch} git@github.com:esmf-org/esmf {subdir}"
-        nuopcclone = f"git clone -b {nuopcbranch} git@github.com:esmf-org/nuopc-app-prototypes"
-        if is_dryrun is True:
-            print(f"would have executed {cmdstring}")
-            print(f"would have executed {nuopcclone}")
-            print(f"would have cd'd to {subdir}")
-            return
-
-        status = []
-        status.append(subprocess.check_output(cmdstring, shell=True).strip().decode("utf-8"))
-
-        # TODO create directory if doesnt exist using native
-        os.chdir(subdir)
-        _runcmd("rm -rf obj mod lib examples test *.o *.e *bat.o* *bat.e*")
-        _runcmd(f"git checkout {branch}")
-        _runcmd(f"git pull origin {branch}")
-        status.append(subprocess.check_output(nuopcclone, shell=True).strip().decode("utf-8"))
-
-        print(f"status from nuopc clone command {nuopcclone} was {status}")
 
 
 def _write_mpi_environment_variables(mpidict, file_handle):
@@ -353,47 +262,3 @@ def _get_header_list(mpi_flavor):
     if "pythontest" in mpi_flavor:
         _header_list.append("python")
     return _header_list
-
-
-def get_args():
-    """get_args
-
-    Returns:
-        list:
-    """
-    parser = argparse.ArgumentParser(description="Archive collector for ESMF testing framework")
-    parser.add_argument(
-        "-w",
-        "--workdir",
-        help="directory where builds will be mad #",
-        required=False,
-        default=os.getcwd(),
-    )
-    parser.add_argument(
-        "-y",
-        "--yaml",
-        help="Yaml file defining builds and testing parameters",
-        required=True,
-    )
-    parser.add_argument(
-        "-a",
-        "--artifacts",
-        help="directory where artifacts will be placed",
-        required=True,
-    )
-    parser.add_argument(
-        "-d",
-        "--dryrun",
-        help="directory where artifacts will be placed",
-        required=False,
-        default=False,
-    )
-    return vars(parser.parse_args())
-
-
-if __name__ == "__main__":
-    args = get_args()
-
-    _data = ESMFTestData(args["yaml"], args["artifacts"], args["workdir"], args["dryrun"])
-    test = ESMFTest(_data)
-    test.create_job_card_and_submit()

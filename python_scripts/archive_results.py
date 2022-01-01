@@ -149,7 +149,7 @@ class ArchiveResults:
     def monitor(self):
         print(f"dryrun is {self.data.dryrun}")
         start_time = time.time()
-        seconds = 60 * 60 * 40 # 40 hours?
+        seconds = 60 * 60 * 40  # 40 hours?
         while True:
             current_time = time.time()
             elapsed_time = current_time - start_time
