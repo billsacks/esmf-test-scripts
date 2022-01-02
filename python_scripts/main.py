@@ -1,8 +1,9 @@
 # pylint: disable=unspecified-encoding
 
 import argparse
+import logging
 import os
-from test import ESMFTest, ESMFTestData
+from test import ESMFTest, ESMFTestUserInput
 
 from config_reader_yaml import fetch_yaml_properties
 from shared import rmdir
@@ -47,7 +48,7 @@ def get_args():
 
 
 def _reclone(_test: ESMFTest):
-    print("rcloning")
+    logging.info("recloning %s into %s", _test.machine_name, _test.artifacts_root)
     rmdir(_test.artifacts_root)
     os.system("git clone https://github.com/esmf-org/esmf-test-artifacts.git")
     os.chdir("esmf-test-artifacts")
@@ -56,9 +57,11 @@ def _reclone(_test: ESMFTest):
 
 
 if __name__ == "__main__":
+    logging.basicConfig(level=logging.DEBUG)
+
     args = get_args()
 
-    _data = ESMFTestData(
+    _data = ESMFTestUserInput(
         args["yaml"], args["artifacts"], args["workdir"], args["dryrun"]
     )
     machine_properties = fetch_yaml_properties(

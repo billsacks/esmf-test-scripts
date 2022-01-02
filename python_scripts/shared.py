@@ -1,7 +1,6 @@
 import os
-import subprocess
 import shutil
-
+import subprocess
 from collections import namedtuple
 
 

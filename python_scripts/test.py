@@ -1,18 +1,15 @@
 # pylint: disable=unspecified-encoding
 
 import os
-import pathlib
 import re
 from collections import namedtuple
-
 
 from schedulers.noscheduler import NoScheduler
 from schedulers.pbs import pbs
 from schedulers.slurm import slurm
+from shared import rmdir, update_repo
 
-from shared import update_repo, rmdir
-
-ESMFTestData = namedtuple(
+ESMFTestUserInput = namedtuple(
     "ESMFTestData", ["yaml_file", "artifacts_root", "workdir", "dryrun"]
 )
 
@@ -20,7 +17,7 @@ ESMFTestData = namedtuple(
 class ESMFTest:
     build_types = ["O", "g"]
 
-    def __init__(self, data: ESMFTestData, machine_properties):
+    def __init__(self, data: ESMFTestUserInput, machine_properties):
 
         self._data = data
         self._scheduler = None
@@ -231,14 +228,6 @@ def _write_extra_commands(compiler_version, file_handle):
     if "extra_commands" in compiler_version:
         for cmd in compiler_version["extra_commands"]:
             file_handle.write(f"{cmd}\n")
-
-
-def _runcmd(cmd, is_dryrun=False):
-    if is_dryrun is True:
-        print(f"would have executed {cmd}")
-    else:
-        print(f"running {cmd}\n")
-        os.system(cmd)
 
 
 def _filename(run_type, comp, ver, key, build_type):
