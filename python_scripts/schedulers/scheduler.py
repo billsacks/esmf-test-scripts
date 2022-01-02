@@ -1,36 +1,26 @@
-# pylint: disable=invalid-name
+# pylint: disable=invalid-name, unspecified-encoding
 
+import logging
+import os
+import subprocess
 from abc import ABC, abstractmethod
 from collections import defaultdict, namedtuple
-import subprocess
 from string import Template
-import os
+from test import TestData
 
-TestData = namedtuple(
-    "TestData",
-    [
-        "mypath",
-        "b_filename",
-        "t_filename",
-        "machine_name",
-        "script_dir",
-        "artifacts_root",
-        "fb",
-        "ft",
-    ],
-)
+from archive_results import ArchiveResults, ArchiveResultsData
 
 MonitorData = namedtuple(
     "MonitorData",
     [
         "path_",
-        "job_number",
-        "sub_directory",
+        "job_id",
+        "build_basename",
         "machine_name",
-        "scheduler_type",
-        "script_directory",
+        "scheduler",
+        "test_root_dir",
         "artifacts_root",
-        "mpi_version",
+        "mpiversion",
         "branch",
         "dryrun",
         "test_filename",
@@ -53,53 +43,54 @@ class Scheduler(ABC):
     def template_data(self):
         raise NotImplementedError()
 
-    def createHeaders(self, test: TestData):
+    def create_headers(self, test: TestData):
         for _file_handler in [test.fb, test.ft]:
             _create_headers(self.template_data, _file_handler, self.TEMPLATE_PATH)
 
-    def submitJob(self, test, subdir, mpiver, branch):
+    def submit_job(self, test: TestData, subdir, mpiver, branch):
         _data = MonitorData(
             path_=test.mypath,
             build_filename=test.b_filename,
             test_filename=test.t_filename,
-            job_number=self.fetch_job_number(test.b_filename),
-            sub_directory=subdir,
+            job_id=self.fetch_job_number(test.b_filename),
+            build_basename=subdir,
             machine_name=test.machine_name,
-            scheduler_type=self.type,
-            script_directory=test.script_dir,
+            scheduler=self.type,
+            test_root_dir=test.script_dir,
             artifacts_root=test.artifacts_root,
-            mpi_version=mpiver,
+            mpiversion=mpiver,
             branch=branch,
             dryrun=False,
         )
-        self._submit_job(_data)
-
-    def _submit_job(self, _data: MonitorData):
-        monitor_cmd_build = monitor_build(_data)
-        result_job_number = batch_test(_data.job_number, _data.test_filename)
-        monitor_cmd_test = monitor_test(_data._replace(job_number=result_job_number))
-
-        self.create_get_res_scripts(monitor_cmd_build, monitor_cmd_test, "insert_default_bash")
+        self.monitor(_data)
+        result_job_number = self._batch_test(_data.job_id, _data.test_filename)
+        self.monitor(_data._replace(job_id=result_job_number))
+        self.create_get_res_scripts(_data, "insert_default_bash")
 
     @abstractmethod
-    def checkqueue(self, job_id):
+    def check_queue(self, job_id):
         raise NotImplementedError()
 
     @classmethod
-    def create_get_res_scripts(cls, monitor_cmd_build, monitor_cmd_test, bash):
-        # write these out no matter what, so we can run them manually, if necessary
-        with open("getres-build.sh", "w") as get_res_file:
-            get_res_file.write(f"#!{bash} -l\n")
-            get_res_file.write(f"{monitor_cmd_build} >& build-res.log &\n")
-            os.system("chmod +x getres-build.sh")
-
-        with open("getres-test.sh", "w") as get_res_file:
-            get_res_file.write(f"#!{bash} -l\n")
-            get_res_file.write(f"{monitor_cmd_test} >& test-res.log &\n")
-            os.system("chmod +x getres-test.sh")
+    def monitor(cls, _data: MonitorData):
+        _monitor(_data)
 
     @classmethod
-    def fetch_job_number(cls, filename):
+    def generate_monitor_command(cls, _data):
+        return f"python3 {_data.path_}/archive_results.py -j {_data.job_id} -b {_data.build_basename} -m {_data.machine_name} -s {_data.scheduler} -t {_data.test_root_dir} -a {_data.artifacts_root} -M {_data.mpiversion} -B {_data.branch} -d {_data.dryrun}"
+
+    @classmethod
+    def create_get_res_scripts(cls, _data, bash) -> None:
+        monitor_cmd = cls.generate_monitor_command(_data)
+        # write these out no matter what, so we can run them manually, if necessary
+        for _type in ["build", "test"]:
+            with open(f"getres-{_type}.sh", "w") as get_res_file:
+                lines = [f"#!{bash} -l", f"{monitor_cmd} >& {_type}-res.log &"]
+                get_res_file.writelines(lines)
+                os.system(f"chmod +x getres-{_type}.sh")
+
+    @classmethod
+    def fetch_job_number(cls, filename) -> str:
         try:
             return (
                 subprocess.check_output(f"sbatch {filename}", shell=True)
@@ -110,58 +101,28 @@ class Scheduler(ABC):
         except subprocess.CalledProcessError as error:
             raise ValueError from error
 
+    def _batch_test(self, job_number, test_filename) -> str:
+        # submit the second job to be dependent on the first
+        batch_test_cmd = f"sbatch --depend=afterok:{job_number} {test_filename}"
+        print(f"Submitting test_batch with command: {batch_test_cmd}")
+        return Scheduler.fetch_job_number(test_filename)
+
 
 class scheduler(Scheduler):
     """scheduler is a wrapper around Scheduler to maintain backwards compatibility"""
 
 
-def monitor_build(_data: MonitorData):
-    # External Call
-    monitor_cmd_build = f"python3 {_data.path_}/archive_results.py -j {_data.job_number} -b {_data.sub_directory} -m {_data.machine_name} -s {_data.scheduler_type} -t {_data.script_directory} -a {_data.artifacts_root} -M {_data.mpi_version} -B {_data.branch} -d {_data.dryrun}"
-
-    if _data.dryrun is True:
-        print(monitor_cmd_build)
-    else:
-        subprocess.Popen(
-            monitor_cmd_build,
-            shell=True,
-            stdin=None,
-            stdout=None,
-            stderr=None,
-            close_fds=True,
-        )
-
-    return monitor_cmd_build
-
-
-def monitor_test(_data: MonitorData):
-    # External Call
-    monitor_cmd_test = f"python3 {_data.path_}/archive_results.py -j {_data.job_number} -b {_data.sub_directory} -m {_data.machine_name} -s {_data.scheduler_type} -t {_data.script_directory} -a {_data.artifacts_root} -M {_data.mpi_version} -B {_data.branch} -d {_data.dryrun}"
-
-    if _data.dryrun is True:
-        print(monitor_cmd_test)
-    else:
-        subprocess.Popen(
-            monitor_cmd_test,
-            shell=True,
-            stdin=None,
-            stdout=None,
-            stderr=None,
-            close_fds=True,
-        )
-    return monitor_cmd_test
-
-
-def batch_test(job_number, test_filename):
-    # submit the second job to be dependent on the first
-    batch_test_cmd = f"sbatch --depend=afterok:{job_number} {test_filename}"
-    print(f"Submitting test_batch with command: {batch_test_cmd}")
-    return Scheduler.fetch_job_number(test_filename)
-
-
-def _create_headers(template_data, file_handler, template_path):
+def _create_headers(template_data, file_handler, template_path) -> None:
     result = None
     with open(template_path, "r") as _template:
         src = Template(_template.read())
         result = src.safe_substitute(template_data)
         file_handler.writelines(result)
+
+
+def _monitor(_data: MonitorData):
+    if _data.dryrun is True:
+        logging.info("emulating archive running")
+    else:
+        archiver = ArchiveResults(ArchiveResultsData(*_data._asdict()))
+        archiver.monitor()

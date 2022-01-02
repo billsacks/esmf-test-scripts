@@ -3,15 +3,44 @@
 import os
 import re
 from collections import namedtuple
+from typing import List
 
 from schedulers.noscheduler import NoScheduler
 from schedulers.pbs import pbs
+from schedulers.scheduler import Scheduler
 from schedulers.slurm import slurm
-from shared import rmdir, update_repo
+from shared import update_repo
 
 ESMFTestUserInput = namedtuple(
-    "ESMFTestData", ["yaml_file", "artifacts_root", "workdir", "dryrun"]
+    "ESMFTestUserInput", ["yaml_file", "artifacts_root", "workdir", "dryrun"]
 )
+
+TestData = namedtuple(
+    "TestData",
+    [
+        "mypath",
+        "b_filename",
+        "t_filename",
+        "machine_name",
+        "script_dir",
+        "artifacts_root",
+        "fb",
+        "ft",
+    ],
+)
+
+
+def parse_test_data(test):
+    return TestData(
+        mypath=test.mypath,
+        b_filename=test.b_filename,
+        t_filename=test.t_filename,
+        machine_name=test.machine_name,
+        script_dir=test.script_dir,
+        artifacts_root=test.artifacts_root,
+        fb=test.fb,
+        ft=test.ft,
+    )
 
 
 class ESMFTest:
@@ -26,40 +55,40 @@ class ESMFTest:
         self.machine_properties = machine_properties
 
     @property
-    def scheduler(self):
+    def scheduler(self) -> Scheduler:
         _map = {"slurm": slurm, "pbs": pbs, "None": NoScheduler}
         if self._scheduler is None:
             self._scheduler = _map[self.machine_properties.scheduler_type]()
         return self._scheduler
 
     @property
-    def artifacts_root(self):
+    def artifacts_root(self) -> str:
         return self._data.artifacts_root
 
     @property
-    def script_dir(self):
+    def script_dir(self) -> str:
         return os.getcwd()
 
     @property
-    def machine_name(self):
+    def machine_name(self) -> str:
         return self.machine_properties.machine_name
 
     @property
-    def do_reclone(self):
+    def do_reclone(self) -> bool:
         return self.machine_properties["reclone-artifacts"]
 
     @property
-    def dryrun(self):
+    def dryrun(self) -> bool:
         if self._data.dryrun:
             return True
         return False
 
     @property
-    def https(self):
+    def https(self) -> bool:
         return "git-https" in self.machine_properties
 
     @property
-    def python_script_header(self):
+    def python_script_header(self) -> List[str]:
         return [
             f"#!{self.machine_properties.bash} -l\n",
             f"cd {os.getcwd()}\n",
@@ -67,12 +96,12 @@ class ESMFTest:
             f"cd {os.getcwd()}/src/addon/ESMPy\n",
         ]
 
-    def get_time_by_type(self, comp, type: str):
-        if f"{type}_time" in self.machine_properties[comp]:
-            return self.machine_properties[comp][f"{type}_time"]
+    def get_time_by_type(self, comp, _typetype: str) -> str:
+        if f"{_typetype}_time" in self.machine_properties[comp]:
+            return self.machine_properties[comp][f"{_typetype}_time"]
         return "1:00:00"
 
-    def create_scripts(self, build_type, comp, ver, mpidict, key):
+    def create_scripts(self, build_type, comp, ver, mpidict, key) -> None:
         mpiflavor = mpidict[key]
         for header_type in _get_header_list(mpidict[key]):
             is_python = header_type not in ["build", "test"]
@@ -138,19 +167,28 @@ class ESMFTest:
                         f"make -j {self.machine_properties.cpn} 2>&1| tee build_$JOBID.log\n\n"
                     )
                 elif header_type == "test":
-                    lines = [
-                        "make info 2>&1| tee info.log \nmake install 2>&1| tee install_$JOBID.log \nmake all_tests 2>&1| tee test_$JOBID.log \n",
-                        "export ESMFMKFILE=`find $PWD/DEFAULTINSTALLDIR -iname esmf.mk`\n",
-                    ]
-                    file_out.writelines(lines)
+                    file_out.writelines(
+                        [
+                            "make info 2>&1| tee info.log",
+                            "make install 2>&1| tee install_$JOBID.log",
+                            "make all_tests 2>&1| tee test_$JOBID.log",
+                            "export ESMFMKFILE=`find $PWD/DEFAULTINSTALLDIR -iname esmf.mk`",
+                        ]
+                    )
                     if mpiflavor["module"] != "None":
-
-                        file_out.write(
-                            "chmod +x runpython.sh\ncd nuopc-app-prototypes\n./testProtos.sh 2>&1| tee ../nuopc_$JOBID.log \n\n"
+                        file_out.writelines(
+                            [
+                                "chmod +x runpython.sh",
+                                "cd nuopc-app-prototypes",
+                                "./testProtos.sh 2>&1| tee ../nuopc_$JOBID.log",
+                            ]
                         )
                 else:
-                    file_out.write(
-                        "python3 setup.py test_examples_dryrun\npython3 setup.py test_regrid_from_file_dryrun\n"
+                    file_out.writelines(
+                        [
+                            "python3 setup.py test_examples_dryrun",
+                            "python3 setup.py test_regrid_from_file_dryrun",
+                        ]
                     )
                 if ("pythontest" in mpiflavor) and (header_type == "test"):
                     self._write_python_test(file_out)
@@ -180,9 +218,11 @@ class ESMFTest:
 
                             update_repo(subdir, branch, nuopcbranch)
 
-                            self.scheduler.createHeaders(self)
+                            self.scheduler.create_headers(parse_test_data(self))
                             self.create_scripts(build_type, comp, ver, mpidict, key)
-                            self.scheduler.submitJob(self, subdir, self._mpiver, branch)
+                            self.scheduler.submit_job(
+                                parse_test_data(self), subdir, self._mpiver, branch
+                            )
                             os.chdir("..")
 
     def _traverse(self):
@@ -193,16 +233,17 @@ class ESMFTest:
                 print(self.machine_properties[comp]["versions"][ver])
 
     def _write_python_test(self, file_out):
-        cmds = [
-            "cd ../src/addon/ESMPy",
-            "export PATH=$PATH:$HOME/.local/bin",
-            "python3 setup.py build 2>&1 | tee python_build.log",
-            f"ssh {self.machine_properties.headnodename} {os.getcwd()}/runpython.sh 2>&1 | tee python_build.log",
-            "python3 setup.py test 2>&1 | tee python_test.log",
-            "python3 setup.py test_examples 2>&1 | tee python_examples.log",
-            "python3 setup.py test_regrid_from_file 2>&1 | tee python_regrid.log",
-        ]
-        file_out.writelines(cmds)
+        file_out.writelines(
+            [
+                "cd ../src/addon/ESMPy",
+                "export PATH=$PATH:$HOME/.local/bin",
+                "python3 setup.py build 2>&1 | tee python_build.log",
+                f"ssh {self.machine_properties.headnodename} {os.getcwd()}/runpython.sh 2>&1 | tee python_build.log",
+                "python3 setup.py test 2>&1 | tee python_test.log",
+                "python3 setup.py test_examples 2>&1 | tee python_examples.log",
+                "python3 setup.py test_regrid_from_file 2>&1 | tee python_regrid.log",
+            ]
+        )
 
 
 def _write_mpi_environment_variables(mpidict, file_handle):

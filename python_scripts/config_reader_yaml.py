@@ -39,14 +39,10 @@ MergedProperties = namedtuple(
 )
 
 
-def fetch_yaml_properties(
-    *, global_yaml_config_path, machine_yaml_config_path
-) -> NamedTuple:
+def fetch_yaml_properties(*, global_yaml_config_path, machine_yaml_config_path) -> NamedTuple:
     with open(global_yaml_config_path) as file:
         global_properties = GlobalProperties(**yaml.load(file, Loader=yaml.SafeLoader))
     with open(machine_yaml_config_path) as file:
 
-        machine_properties = MachineProperties(
-            **yaml.load(file, Loader=yaml.SafeLoader)
-        )
+        machine_properties = MachineProperties(**yaml.load(file, Loader=yaml.SafeLoader))
     return MergedProperties(*(global_properties + machine_properties))

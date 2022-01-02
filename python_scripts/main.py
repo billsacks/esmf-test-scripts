@@ -15,9 +15,7 @@ def get_args():
     Returns:
         list:
     """
-    parser = argparse.ArgumentParser(
-        description="Archive collector for ESMF testing framework"
-    )
+    parser = argparse.ArgumentParser(description="Archive collector for ESMF testing framework")
     parser.add_argument(
         "-w",
         "--workdir",
@@ -61,14 +59,10 @@ if __name__ == "__main__":
 
     args = get_args()
 
-    _data = ESMFTestUserInput(
-        args["yaml"], args["artifacts"], args["workdir"], args["dryrun"]
-    )
+    _data = ESMFTestUserInput(args["yaml"], args["artifacts"], args["workdir"], args["dryrun"])
     machine_properties = fetch_yaml_properties(
         machine_yaml_config_path=os.path.dirname(args["yaml"]),
-        global_yaml_config_path=os.path.join(
-            os.path.dirname(args["yaml"]), "global.yaml"
-        ),
+        global_yaml_config_path=os.path.join(os.path.dirname(args["yaml"]), "global.yaml"),
     )
 
     test = ESMFTest(_data, machine_properties)

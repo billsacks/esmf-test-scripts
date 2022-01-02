@@ -9,5 +9,5 @@ class NoScheduler(Scheduler):
     def template_data(self):
         return {}
 
-    def checkqueue(self, _):
+    def check_queue(self, _):
         return True
