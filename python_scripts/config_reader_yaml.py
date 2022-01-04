@@ -14,7 +14,7 @@ def uname():
     return getattr(os, "uname")()[1]
 
 
-GlobalProperties = namedtuple("GlobalProperties", ["reclone-artifacts"])
+GlobalProperties = namedtuple("GlobalProperties", ["reclone_artifacts"])
 
 MachineProperties = namedtuple_with_defaults(
     "MachineProperties",
@@ -29,7 +29,7 @@ MachineProperties = namedtuple_with_defaults(
         "scheduler",
         "cluster",
         "constraint",
-        "git-https",
+        "git_https",
     ],
     {"bash": "/bin/bash", "headnodename": uname(), "nuopcbranch": "develop"},
 )
