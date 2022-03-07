@@ -1,11 +1,16 @@
+
 """
 Job Abstraction
 """
+
+
+from pathlib import Path
 
 import abc
 import reprlib
 from typing import Any, Dict, Generator, Iterable
 import yaml
+import json
 
 
 class Base(abc.ABC):
@@ -25,6 +30,10 @@ class Base(abc.ABC):
 
     def __dir__(self) -> Iterable[str]:
         return [str(k) for k in self.__dict__]
+
+    def to_json(self):
+        """converts to json output"""
+        return json.dumps(self.__dict__)
 
 
 class JobRequest(Base):
@@ -49,7 +58,6 @@ class Version(Base):
     """holds version information"""
 
 
-def read_yaml():
-    """convenience for getting a JobRequest from yaml file"""
-    with open("./tests/fixtures/cheyenne.yaml", "r") as _file:
+def read_yaml(_path: Path):
+    with open(_path) as _file:
         return JobRequest("JOB", **yaml.safe_load(_file))
