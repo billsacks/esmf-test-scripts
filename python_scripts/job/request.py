@@ -4,13 +4,13 @@ Job Abstraction
 """
 
 
-from pathlib import Path
-
 import abc
-import reprlib
-from typing import Any, Dict, Generator, Iterable
-import yaml
 import json
+import reprlib
+from pathlib import Path
+from typing import Any, Dict, Generator, Iterable
+
+import yaml
 
 
 class Base(abc.ABC):
@@ -59,5 +59,6 @@ class Version(Base):
 
 
 def read_yaml(_path: Path):
-    with open(_path) as _file:
+    """reads yaml file into JobRequest instance"""
+    with open(_path, "r") as _file:
         return JobRequest("JOB", **yaml.safe_load(_file))
