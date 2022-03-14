@@ -6,8 +6,6 @@ Wed Feb 16 07:42:49 MST 2022 #var -> str(Datetime)
 # Suppose we'll need a test for this.
 # $is_pbs $is_sbatch -> sbatch = slurm
 
-######### SCHEDULER #########
-
 ### PBS 
 ### besides paths and userid, is everything else static?
 #PBS -N build-intel_18.0.5_intelmpi_O.bat
@@ -32,14 +30,73 @@ $job_id_function for pbs -> JOBID="`echo $PBS_JOBID | cut -d. -f1`"
 export JOBID=$SLURM_JOBID
 
 ########## Load Modules ##########
+# if "extramodule" in self.machine_list[comp]:
 #?cd /glade/scratch/rlong/esmf-testing/intel_18.0.5_intelmpi_O_jedwards_pio_update
 module load intel/18.0.5 impi/2018.4.274 netcdf/4.6.3 #var
 module list >& module-build.log #var
 
+########## Load Modules NETCDF, HDF5, netcdf-fortran ##########
+#   if self.machine_list[comp]["versions"][ver]["netcdf"] == "None":
+#            modulecmd = "module load {} {} \n\n".format(
+#                self.machine_list[comp]["versions"][ver]["compiler"],
+#                mpiflavor["module"],
+#            )
+#            esmfnetcdf = "\n"
+#            file_out.write(modulecmd)
+#        else:
+#            modulecmd = "module load {} {} {}\n".format(
+#                self.machine_list[comp]["versions"][ver]["compiler"],
+#                mpiflavor["module"],
+#                self.machine_list[comp]["versions"][ver]["netcdf"],
+#            )
+#            esmfnetcdf = "export ESMF_NETCDF=nc-config\n\n"
+#            file_out.write(modulecmd)
+#       if "hdf5" in self.machine_list[comp]["versions"][ver]:
+#            modulecmd = "module load {} \n".format(
+#                self.machine_list[comp]["versions"][ver]["hdf5"]
+#            )
+#            file_out.write(modulecmd)
+#        if "netcdf-fortran" in self.machine_list[comp]["versions"][ver]:
+#            modulecmd = "module load {} \n".format(
+#                self.machine_list[comp]["versions"][ver]["netcdf-fortran"]
+
+
+
+########## UnLoad Modules ##########
+# if "unloadmodule" in self.machine_list[comp]:
+module unload <>
+
+########## Use Modules ##########
+# if "modulepath" in self.machine_list:
+module use <>
+
+########## List Modules ##########
+if headerType == "build":
+            file_out.write("module list >& module-build.log\n\n")
+elif headerType == "test":
+            file_out.write("module list >& module-test.log\n\n")
+
+########## Extras? ##########
+if "extra_env_vars" in self.machine_list[comp]["versions"][ver]:
+            for var in self.machine_list[comp]["versions"][ver]["extra_env_vars"]:
+                file_out.write(
+                    "export {}\n".format(
+                        self.machine_list[comp]["versions"][ver]["extra_env_vars"][var]
+                    )
+                )
+
+        if "extra_commands" in self.machine_list[comp]["versions"][ver]:
+            for cmd in self.machine_list[comp]["versions"][ver]["extra_commands"]:
+                file_out.write(
+                    "{}\n".format(
+                        self.machine_list[comp]["versions"][ver]["extra_commands"][cmd]
+                    )
+                )
+
 
 ########## Not Sure Section ##########
 set -x # static
-export ESMF_NETCDF=nc-config # static
+export ESMF_NETCDF=nc-config # static (write netcdf output here)
 
 #??? Not sure what this is for, maybe Python testing?
 tar xvfz ~/pytest-input.tar.gz
@@ -55,20 +112,29 @@ export ESMF_TESTWITHTHREADS='ON' #static
 ####################
 # all variable below
 #####################
+# if headerType == build
+make -j {} 2>&1| tee build_$JOBID.log #var cpn
+
+# if headerType == test
 make info 2>&1| tee info.log
 make install 2>&1| tee install_$JOBID.log
 make all_tests 2>&1| tee test_$JOBID.log
-
 export ESMFMKFILE=`find $PWD/DEFAULTINSTALLDIR -iname esmf.mk`
+
+# if headerType == test / python
+# if runpython.sh
+cd ../src/addon/ESMPy
+export PATH=$PATH:$HOME/.local/bin
+python3 setup.py build 2>&1 | tee python_build.log
+ssh {} {}/runpython.sh 2>&1 | tee python_build.log #var headnodename, cwd
+python3 setup.py test 2>&1 | tee python_test.log
+python3 setup.py test_examples 2>&1 | tee python_examples.log
+python3 setup.py test_regrid_from_file 2>&1 | tee python_regrid.log
+
 chmod +x runpython.sh
 cd nuopc-app-prototypes
 ./testProtos.sh 2>&1| tee ../nuopc_$JOBID.log
 
-cd ../src/addon/ESMPy
 
-export PATH=$PATH:$HOME/.local/bin
-python3 setup.py build 2>&1 | tee python_build.log
+
 ssh cheyenne6 /glade/scratch/rlong/esmf-testing/intel_18.0.5_openmpi_O_jedwards_pio_update/runpython.sh 2>&1 | tee python_build.log
-python3 setup.py test 2>&1 | tee python_test.log
-python3 setup.py test_examples 2>&1 | tee python_examples.log
-python3 setup.py test_regrid_from_file 2>&1 | tee python_regrid.log
