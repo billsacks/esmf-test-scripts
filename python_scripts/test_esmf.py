@@ -12,9 +12,9 @@ from typing import List, Any
 import yaml
 
 from archive_results import ArchiveResults
-from pbs import PBS
-from slurm import Slurm
-from noscheduler import NoScheduler
+from python_scripts.schedule.pbs import PBS
+from python_scripts.schedule.slurm import Slurm
+from python_scripts.schedule.noscheduler import NoScheduler
 import logging
 
 REPO_ESMF_TEST_ARTIFACTS = "https://github.com/esmf-org/esmf-test-artifacts.git"
@@ -218,11 +218,10 @@ class ESMFTest:
                     "\nmodule load {}\n".format(self.machine_list[comp]["extramodule"])
                 )
 
-            if (
-                    mpi_flavor is None
-                    or "module" not in mpi_flavor
-                    or mpi_flavor["module"] in [None, "None", "none"]
-            ):
+            missing_mpi_flavor_module = mpi_flavor is None or "module" not in mpi_flavor or mpi_flavor["module"] in [
+                None, "None", "none"]
+
+            if missing_mpi_flavor_module:
                 mpi_flavor = {"module": ""}
                 cmd_string = "export ESMF_MPIRUN={}/src/Infrastructure/stubs/mpiuni/mpirun\n".format(
                     os.getcwd()

@@ -50,7 +50,7 @@ class NoScheduler(Scheduler):
             else:
                 file_out = self.test.ft
                 jobid = 12346
-            file_out.write("#!{} -l\n".format(self.test.bash))
+            file_out.write("#!{} -l\n".format(self.test.bash_command))
             file_out.write("export JOBID={}\n".format(jobid))
 
     def check_queue(self, _):

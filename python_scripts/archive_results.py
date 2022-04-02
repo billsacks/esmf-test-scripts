@@ -11,9 +11,9 @@ import time
 from datetime import datetime
 from typing import List, Any
 
-from noscheduler import NoScheduler
-from pbs import PBS
-from slurm import Slurm
+from python_scripts.schedule.noscheduler import NoScheduler
+from python_scripts.schedule.pbs import PBS
+from python_scripts.schedule.slurm import Slurm
 
 logging.basicConfig(
     level=logging.DEBUG,
