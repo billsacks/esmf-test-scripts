@@ -3,8 +3,8 @@ import os
 import pathlib
 from typing import List, Dict, Any
 
-
 # Keys
+CORES_PER_NODE_KEY = 'corespernode'
 HDF5_KEY = "hdf5"
 NETCDF_FORTRAN_KEY = "netcdf-fortran"
 COMPILER_VERSIONS_KEY = "versions"
@@ -20,9 +20,10 @@ PYTHON_TEST_KEY = "pythontest"
 HEADER_LIST = [BUILD_KEY, TEST_KEY]
 
 ScriptProps = collections.namedtuple("ScriptProps",
-                                     ['machine_list', 'compiler', 'version', 'bash_command', 'mpi_key', 'mpidict',
-                                      'c_version', 'header_type', 'cpn', 'build_type', 'mpi_flavor', 'head_node_name',
-                                      'mpi_version', 'key'])
+                                     [
+                                         'machine_list', 'compiler', 'c_version', 'bash_command', 'mpi_key', 'mpidict',
+                                         'mpi_flavor', 'header_type', 'cpn', 'head_node_name',
+                                     ])
 
 
 class Script(collections.UserList):
@@ -39,33 +40,39 @@ class Script(collections.UserList):
     @staticmethod
     def script_name(props: ScriptProps):
         _map = {
-            BUILD_KEY.lower(): f"{BUILD_KEY}-{props.compiler}_{props.c_version}_{props.key}_{props.build_type}.bat",
-            TEST_KEY.lower(): f"{TEST_KEY}-{props.compiler}_{props.c_version}_{props.key}_{props.build_type}.bat"
+            BUILD_KEY.lower(): f"{BUILD_KEY}-{props.compiler}_{props.c_version}_{props.mpi_key}_{props.header_type}.bat",
+            TEST_KEY.lower(): f"{TEST_KEY}-{props.compiler}_{props.c_version}_{props.mpi_key}_{props.header_type}.bat"
         }
-        return _map[props.build_type]
+        return _map[props.header_type]
 
 
 class CliScriptGenerator:
-    def __init__(self, mpi_dictionary: Dict[str, Any], key: Any, machine_list: List[str], compiler, bash_command: str,
+    def __init__(self, mpi_dictionary: Dict[str, Any], mpi_key: Any, machine_list: List[str], compiler: str,
+                 c_version: str, bash_command: str,
                  head_node_name: str):
-        self.mpi_dictionary = mpi_dictionary
-        self.key = key
         self.machine_list = machine_list
         self.compiler = compiler
+        self.c_version = c_version
+        self.mpi_dictionary = mpi_dictionary
+        self.mpi_key = mpi_key
         self.bash_command = bash_command
         self.head_node_name = head_node_name
 
+    @property
+    def cpn(self):
+        if CORES_PER_NODE_KEY in self.machine_list:
+            return self.machine_list[CORES_PER_NODE_KEY]
+        return None
+
     def props(self, header_type):
-        return ScriptProps(self.machine_list, self.compiler, "version", self.bash_command, self.key,
-                           self.mpi_dictionary,
-                           "c_version", header_type, "cpn", "build_type", self.mpi_flavor, self.head_node_name,
-                           "mpi_version", self.key)
+        return ScriptProps(self.machine_list, self.compiler, self.c_version, self.bash_command, self.mpi_key,
+                           self.mpi_dictionary, header_type, self.cpn, self.mpi_flavor, self.head_node_name)
 
     @property
     def mpi_flavor(self):
-        if is_missing_mpi_flavor(self.mpi_dictionary[self.key]):
+        if is_missing_mpi_flavor(self.mpi_dictionary[self.mpi_key]):
             return {"module": ""}
-        return self.mpi_dictionary[self.key]
+        return self.mpi_dictionary[self.mpi_key]
 
     @property
     def header_list(self):
@@ -91,8 +98,8 @@ class CliScriptGenerator:
                 add_extra_commands(props),
                 f"export ESMF_DIR={os.getcwd()}\n",
                 f"export ESMF_COMPILER={self.compiler}\n",
-                f"export ESMF_COMM={self.key}\n"
-                f"export ESMF_BOPT='{props.build_type}'\n",
+                f"export ESMF_COMM={self.mpi_key}\n"
+                f"export ESMF_BOPT='{props.header_type}'\n",
                 "export ESMF_TESTEXHAUSTIVE='ON'\n",
                 "export ESMF_TESTWITHTHREADS='ON'\n",
                 add_make_configuration(props),
@@ -192,7 +199,7 @@ def add_mpi_configuration(props: ScriptProps) -> List[str]:
     if "mpi_env_vars" in props.mpi_flavor:
         for mpi_var in props.mpi_flavor["mpi_env_vars"]:
             results.append(
-                "export {}\n".format(props.mpidict[props.key]["mpi_env_vars"][mpi_var])
+                "export {}\n".format(props.mpidict[props.mpi_key]["mpi_env_vars"][mpi_var])
             )
     return results
 
