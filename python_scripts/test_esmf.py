@@ -122,20 +122,6 @@ class ESMFTest:
             self.cpn = self.machine_list["corespernode"]
             self.scheduler_type = self.machine_list["scheduler"]
 
-            # Now traverse the tree
-            # TODO I don't know why this is here
-            # for comp in self.machine_list['compiler']:
-            #
-            #     for ver in self.machine_list[comp]['versions']:
-            #         logging.debug("machine_list: ", self.machine_list)
-            #         logging.debug("machine_list[comp]: ", self.machine_list[comp])
-            #         logging.debug("machine_list[comp]['versions']: ", self.machine_list[comp]['versions'])
-            #         logging.debug("machine_list[comp]['versions'][ver]: ", self.machine_list[comp]['versions'][ver])
-            #         logging.debug("machine_list[comp]['versions'][ver]['mpi']: ",
-            #               self.machine_list[comp]['versions'][ver]['mpi'])
-            #
-            #         logging.debug(self.machine_list[comp]['versions'][ver])
-
     def run_command(self, cmd):
         if self.dryrun:
             logging.debug("*DRYRUN* running command: [%s]", cmd)
@@ -307,7 +293,6 @@ class ESMFTest:
             elif headerType == "test":
                 cmd_string = "make info 2>&1| tee info.log \nmake install 2>&1| tee install_$JOBID.log \nmake all_tests 2>&1| tee test_$JOBID.log \n"
                 file_out.write(cmd_string)
-                #       file_out.write("ssh {} {}/{}/getres-int.sh\n".format(self.head_node_name,self.script_dir,os.getcwd()))
                 cmd_string = (
                     "export ESMFMKFILE=`find $PWD/DEFAULTINSTALLDIR -iname esmf.mk`\n"
                 )
@@ -315,11 +300,9 @@ class ESMFTest:
                 if mpi_flavor["module"] != "None":
                     cmd_string = "chmod +x runpython.sh\ncd nuopc-app-prototypes\n./testProtos.sh 2>&1| tee ../nuopc_$JOBID.log \n\n"
                     file_out.write(cmd_string)
-            #         file_out.write("ssh {} {}/{}/getres-int.sh\n".format(self.head_node_name,self.script_dir,os.getcwd()))
             else:
                 cmd_string = "python3 setup.py test_examples_dryrun\npython3 setup.py test_regrid_from_file_dryrun\n"
                 file_out.write(cmd_string)
-            #       file_out.write("ssh {} {}/{}/getres-int.sh\n".format(self.head_node_name,self.script_dir,os.getcwd()))
 
             if ("pythontest" in mpi_flavor) and (headerType == "test"):
                 cmd_string = "\ncd ../src/addon/ESMPy\n"
