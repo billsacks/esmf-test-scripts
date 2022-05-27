@@ -115,16 +115,21 @@ class pbs(scheduler):
     # than being split across multiple lines (which can otherwise happen for a narrow
     # terminal window)
     queue_query = "tracejob -q -w 9999 {} | tail -n 1".format(jobid)
+    print(queue_query)
     try:
       result = (
         subprocess.check_output(queue_query, shell=True).strip().decode("utf-8")
       )
+      print(result)
       finished_re = r"S\s+dequeuing"
       if re.search(finished_re, result):
+        print("Found it!")
         return True
       else:
+        print("Didn't find it")
         return False
     except:
+      print("Exception")
       result = "done"
       return True
     return False
