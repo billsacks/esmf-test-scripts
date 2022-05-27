@@ -128,8 +128,9 @@ class pbs(scheduler):
       else:
         print("Didn't find it")
         return False
-    except:
+    except Exception as e:
       print("Exception")
+      print(e)
       result = "done"
       return True
     return False
