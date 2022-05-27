@@ -88,11 +88,14 @@ class pbs(scheduler):
       sys.exit("unsupported pbs_job_checker: {}".format(self._pbs_job_checker))
 
   def _checkqueue_default(self,jobid):
+    print("in checkqueue_default")
     if(int(jobid) < 0):
       return True
     queue_query = "qstat -H {} | tail -n 1 | awk -F ' +' '{{print $10}}'".format(jobid)
+    print(queue_query)
     try:
       result= subprocess.check_output(queue_query,shell=True).strip().decode('utf-8')
+      print(result)
       if(result == "F"): #could check for R and Q to see if it is running or waiting
         return True
       else:
@@ -103,6 +106,7 @@ class pbs(scheduler):
     return False
 
   def _checkqueue_tracejob(self,jobid):
+    print("in checkqueue_tracejob")
     if int(jobid) < 0:
       return True
 
