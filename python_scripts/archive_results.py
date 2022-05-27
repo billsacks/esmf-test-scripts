@@ -47,26 +47,15 @@ class ArchiveResults:
         seconds = 144000
         self.build_dir = "{}/{}".format(test_root_dir, build_basename)
         while True:
+            print("Checking")
             current_time = time.time()
             elapsed_time = current_time - start_time
             job_done = self.scheduler.checkqueue(jobid)
             if job_done:
-                oe_filelist = glob.glob(
-                    "{}/{}/*_{}*.log".format(test_root_dir, build_basename, jobid)
-                )
-                oe_filelist.extend(
-                    glob.glob("{}/{}/*.bat".format(test_root_dir, build_basename))
-                )
-                oe_filelist.extend(
-                    glob.glob(
-                        "{}/{}/module-*.log".format(test_root_dir, build_basename)
-                    )
-                )
-                print("filelist is {}".format(oe_filelist))
-                print("oe list is {}\n".format(oe_filelist))
-                self.copy_artifacts(oe_filelist)
+                print("Job done")
                 break
-            time.sleep(30)
+            print("Not done yet")
+            time.sleep(1)
 
             if elapsed_time > seconds:
                 print("Finished iterating in: " + str(int(elapsed_time)) + " seconds")
